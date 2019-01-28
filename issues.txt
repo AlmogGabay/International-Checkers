@@ -1,0 +1,3 @@
+issues:
+1) does not force capturing.
+2) does not allow 2 consicutive capturings.
