@@ -133,8 +133,6 @@ ul {
     transition: background-color 0.2s;
 }
 
-.suggested-capture {}
-
 .capture {
     background-color: red;
     opacity: 0.8;

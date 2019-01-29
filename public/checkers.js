@@ -10,48 +10,18 @@ let tiles = [
         document.querySelectorAll(".sixth"),
         document.querySelectorAll(".seventh"),
         document.querySelectorAll(".eighth")
-    ];
-let turn = "black-pawn", blackPawns = 12, whitePawns = 12, selectedPawn;
-
-let captureOccured = {
-    type: undefined,
-    row: undefined,
-    rowStep: undefined,
-    tile: undefined,
-    tileStep: undefined,
-    executeCapture: function(row = this.row, rowStep = this.rowStep, tile = this.tile, tileStep = this.tileStep, captureType = this.type) {
-        switch (captureType) {
-            case 1: {
-                tiles[row+rowStep][tile+tileStep].classList.remove("white-pawn", "capture");
-                whitePawns--;
-                break;
-            }
-            case 2: {
-                tiles[row+rowStep][tile].classList.remove("white-pawn", "capture");
-                whitePawns--;
-                break;
-            }
-            case 3: {
-                tiles[row+rowStep][tile+tileStep].classList.remove("black-pawn", "capture");
-                blackPawns--;
-                break;
-            }
-            case 4: {
-                tiles[row+rowStep][tile].classList.remove("black-pawn", "capture");
-                blackPawns--;
-                break;
-            }
-        }
+    ],
+    printTurn = document.querySelector("#turn"),
+    startButton = document.querySelector("#start"),
+    turn = "black-pawn", 
+    blackPawns = 12, 
+    whitePawns = 12, 
+    lastSelected,
+    lastCaptureSuggestion = {},
+    setTiles = {
+        black: tile => tile.classList.add("black-pawn"),
+        white: tile => tile.classList.add("white-pawn")
     }
-}
-
-let printTurn = document.querySelector("#turn"),
-    startButton = document.querySelector("#start");
-
-let setTiles = {
-    black: tile => tile.classList.add("black-pawn"),
-    white: tile => tile.classList.add("white-pawn")
-};
 
 startButton.addEventListener("click", () => {
     gameStart();
@@ -70,37 +40,41 @@ function gameStart () {
     printTurn.textContent = turn;
     for (let i = 1; i < tiles.length; i++) {
         for (let j = 0; j < 4; j++) {
-            tiles[i][j].addEventListener("click", () => checkMovement(i, j));
+            tiles[i][j].addEventListener("click", function() { 
+                checkMovement(this, i, j);
+            });
         }
     }
 }
 
-function checkMovement (row, tile) {
-    if (tiles[row][tile].classList.contains("suggested-move")) { // if a suggested path is clicked
-        if (tiles[row][tile].classList.contains("suggested-capture")) {
-            captureOccured.executeCapture();
+function checkMovement (selectedTile, row, tile) {
+    if (selectedTile.classList.contains("suggested-move")) { // if a suggested path is clicked
+        if (selectedTile.capture) { // if the clicked tile is a suggested capture
+            executeCapture(selectedTile, selectedTile.capture);
+            delete selectedTile.capture;
         }
-        selectedPawn.classList.remove(turn);
-        tiles[row][tile].classList.add(turn); 
+        lastSelected.classList.remove(turn);
+        selectedTile.classList.add(turn); 
         turn = (turn == "black-pawn") ?  "white-pawn" : "black-pawn"; // switch turns
         printTurn.textContent = turn;
     }
     clearSuggestions();
-    if (tiles[row][tile].classList.contains(turn)) { 
-        if (turn == "black-pawn") {
+    delete lastCaptureSuggestion.capture; // removes this property in case the capture path was ignored
+    if (selectedTile.classList.contains(turn)) { // if a tile which has a pawn on it is selected
+        if (turn == "black-pawn") { //black turn
             (row%2 != 0) ? showSuggestions(row, tile, 1, -1) : showSuggestions(row, tile, 1, 1);
         }
         else { // white turn
             (row%2 != 0) ? showSuggestions(row, tile, -1, -1) : showSuggestions(row, tile, -1, 1);
         }
-    selectedPawn = tiles[row][tile];
     }
+    lastSelected = selectedTile; // "remembers" the last tile that was selected, this allows to move a capturer to its new position
 }
 
 function clearSuggestions () {
     for (let i = 1; i < tiles.length; i++) {
         for (let j = 0; j < 4; j++) {
-            tiles[i][j].classList.remove("suggested-move", "capture", "suggested-capture");
+            tiles[i][j].classList.remove("suggested-move", "capture");
         }
     }
 }
@@ -110,14 +84,10 @@ function showSuggestions (row, tile, rowStep, tileStep) {
         if (tiles[row+rowStep][tile+tileStep] && !tiles[row+rowStep][tile+tileStep].classList.contains("black-pawn")) {
             if (tiles[row+rowStep][tile+tileStep].classList.contains("white-pawn")) {
                 if (tiles[row+rowStep*2][tile+tileStep] && !tiles[row+rowStep*2][tile+tileStep].classList.contains("black-pawn") && !tiles[row+rowStep*2][tile+tileStep].classList.contains("white-pawn")) {
-                    tiles[row+rowStep*2][tile+tileStep].classList.add("suggested-move","suggested-capture");
+                    tiles[row+rowStep*2][tile+tileStep].classList.add("suggested-move");
+                    tiles[row+rowStep*2][tile+tileStep].capture = tiles[row+rowStep][tile+tileStep];
+                    lastCaptureSuggestion = tiles[row+rowStep*2][tile+tileStep];
                     tiles[row+rowStep][tile+tileStep].classList.add("capture");
-                    captureOccured.value = true;
-                    captureOccured.type = 1;
-                    captureOccured.row = row;
-                    captureOccured.rowStep = rowStep;
-                    captureOccured.tile = tile;
-                    captureOccured.tileStep = tileStep;
                 }
             }
             else {
@@ -126,15 +96,11 @@ function showSuggestions (row, tile, rowStep, tileStep) {
         }
         if (tiles[row+rowStep][tile] && !tiles[row+rowStep][tile].classList.contains("black-pawn")) {
             if (tiles[row+rowStep][tile].classList.contains("white-pawn")) {
-                if (tiles[row+rowStep*2][tile+tileStep*(-1)] && !tiles[row+rowStep*2][tile+tileStep*(-1)].classList.contains("black-pawn") && !tiles[row+rowStep*2][tile+tileStep*(-1)].classList.contains("white-pawn")) {
-                    tiles[row+rowStep*2][tile+tileStep*(-1)].classList.add("suggested-move","suggested-capture");
+                if (tiles[row+rowStep*2][tile-tileStep] && !tiles[row+rowStep*2][tile-tileStep].classList.contains("black-pawn") && !tiles[row+rowStep*2][tile-tileStep].classList.contains("white-pawn")) {
+                    tiles[row+rowStep*2][tile-tileStep].classList.add("suggested-move");
+                    tiles[row+rowStep*2][tile-tileStep].capture = tiles[row+rowStep][tile];
+                    lastCaptureSuggestion = tiles[row+rowStep*2][tile-tileStep];
                     tiles[row+rowStep][tile].classList.add("capture");
-                    captureOccured.value = true;
-                    captureOccured.type = 2;
-                    captureOccured.row = row;
-                    captureOccured.rowStep = rowStep;
-                    captureOccured.tile = tile;
-                    captureOccured.tileStep = tileStep;
                 }
             }
             else {
@@ -146,14 +112,10 @@ function showSuggestions (row, tile, rowStep, tileStep) {
         if (tiles[row+rowStep][tile+tileStep] && !tiles[row+rowStep][tile+tileStep].classList.contains("white-pawn")) {
             if (tiles[row+rowStep][tile+tileStep].classList.contains("black-pawn")) {
                 if (tiles[row+rowStep*2][tile+tileStep] && !tiles[row+rowStep*2][tile+tileStep].classList.contains("black-pawn") && !tiles[row+rowStep*2][tile+tileStep].classList.contains("white-pawn")) {
-                    tiles[row+rowStep*2][tile+tileStep].classList.add("suggested-move","suggested-capture");
+                    tiles[row+rowStep*2][tile+tileStep].classList.add("suggested-move");
+                    tiles[row+rowStep*2][tile+tileStep].capture = tiles[row+rowStep][tile+tileStep];
+                    lastCaptureSuggestion = tiles[row+rowStep*2][tile+tileStep];
                     tiles[row+rowStep][tile+tileStep].classList.add("capture");
-                    captureOccured.value = true;
-                    captureOccured.type = 3;
-                    captureOccured.row = row;
-                    captureOccured.rowStep = rowStep;
-                    captureOccured.tile = tile;
-                    captureOccured.tileStep = tileStep;
                 }  
             }
             else {
@@ -162,15 +124,11 @@ function showSuggestions (row, tile, rowStep, tileStep) {
         }
         if (tiles[row+rowStep][tile] && !tiles[row+rowStep][tile].classList.contains("white-pawn")) {
             if (tiles[row+rowStep][tile].classList.contains("black-pawn")) {
-                if (tiles[row+rowStep*2][tile+tileStep*(-1)] && !tiles[row+rowStep*2][tile+tileStep*(-1)].classList.contains("black-pawn") && !tiles[row+rowStep*2][tile+tileStep*(-1)].classList.contains("white-pawn")) {
-                    tiles[row+rowStep*2][tile+tileStep*(-1)].classList.add("suggested-move","suggested-capture");
+                if (tiles[row+rowStep*2][tile-tileStep] && !tiles[row+rowStep*2][tile-tileStep].classList.contains("black-pawn") && !tiles[row+rowStep*2][tile-tileStep].classList.contains("white-pawn")) {
+                    tiles[row+rowStep*2][tile-tileStep].classList.add("suggested-move");
+                    tiles[row+rowStep*2][tile-tileStep].capture = tiles[row+rowStep][tile];
+                    lastCaptureSuggestion = tiles[row+rowStep*2][tile-tileStep];
                     tiles[row+rowStep][tile].classList.add("capture");
-                    captureOccured.value = true;
-                    captureOccured.type = 4;
-                    captureOccured.row = row;
-                    captureOccured.rowStep = rowStep;
-                    captureOccured.tile = tile;
-                    captureOccured.tileStep = tileStep;
                 } 
             }
             else {
@@ -178,4 +136,29 @@ function showSuggestions (row, tile, rowStep, tileStep) {
             }
         }
     }
+}
+
+function executeCapture (capturer, captured) {
+    if (turn == "black-pawn") {
+        captured.classList.remove("white-pawn");
+        whitePawns--;
+    }
+    else {
+        captured.classList.remove("black-pawn");
+        blackPawns--;
+    }
+}
+
+function recShowSuggestions1 (row, tile, rowStep, tileStep) {
+    if (tiles[row+rowStep][tile+tileStep].classList.contains("white-pawn")) {
+        return recShowSuggestions1(row+rowStep*2, tile+tileStep, rowStep, tileStep);
+    }
+    return tiles[row][tile];
+}
+
+function recShowSuggestions2 (row, tile, rowStep, tileStep) {
+    if (tiles[row+rowStep][tile-tileStep].classList.contains("white-pawn")) {
+        return recShowSuggestions2(row+rowStep*2, tile-tileStep, rowStep, tileStep);
+    }
+    return tiles[row][tile];
 }
