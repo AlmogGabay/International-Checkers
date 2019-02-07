@@ -16,7 +16,7 @@ let tiles = [
     blackPawns = 12, 
     whitePawns = 12, 
     lastSelected,
-    setTiles = {
+    setPawns = {
         black: tile => tile.classList.add("black-pawn"),
         white: tile => tile.classList.add("white-pawn")
     }
@@ -25,23 +25,20 @@ startButton.addEventListener("click", () => {
     gameStart();
     startButton.style.opacity = "0";
 });
-startButton.addEventListener("transitionend", function () {this.style.display = "none"});
+startButton.addEventListener("transitionend", function () { this.style.display = "none" });
 
 /* Places all the pawns in their initial position */
 function gameStart () { 
-    tiles[1].forEach(setTiles.black);
-    tiles[2].forEach(setTiles.black);
-    tiles[3].forEach(setTiles.black);
-    tiles[6].forEach(setTiles.white);
-    tiles[7].forEach(setTiles.white);
-    tiles[8].forEach(setTiles.white);
+    tiles[1].forEach(setPawns.black);
+    tiles[2].forEach(setPawns.black);
+    tiles[3].forEach(setPawns.black);
+    tiles[6].forEach(setPawns.white);
+    tiles[7].forEach(setPawns.white);
+    tiles[8].forEach(setPawns.white);
     printTurn.textContent = turn;
     for (let i = 1; i < tiles.length; i++) {
         for (let j = 0; j < 4; j++) {
-            tiles[i][j].row = i;
-            tiles[i][j].addEventListener("click", function() { 
-                checkMovement(this, i, j);
-            });
+            tiles[i][j].addEventListener("click", function() { checkMovement(this, i, j); });
         }
     }
 }
@@ -59,20 +56,10 @@ function checkMovement (selectedTile, row, tile) {
     clearSuggestionsAndCaptures();
     if (selectedTile.classList.contains(turn)) { // if a tile which has a pawn on it is selected
         if (turn == "black-pawn") { // black turn
-            if (row%2 == 0) {
-                pawnMovementCalculation(row, tile, 1, 1, 1, "black-pawn", "white-pawn");
-            }
-            else {
-                pawnMovementCalculation(row, tile, 1, -1, -1, "black-pawn", "white-pawn"); 
-            }
+            (row%2 == 0) ? pawnMovementCalculation(row, tile, 1, 1, 1, "black-pawn", "white-pawn") : pawnMovementCalculation(row, tile, 1, -1, -1, "black-pawn", "white-pawn");
         }
         else { // white turn
-            if (row%2 == 0) {
-                pawnMovementCalculation(row, tile, -1, 1, 1, "white-pawn", "black-pawn");
-            }
-            else {
-                pawnMovementCalculation(row, tile, -1, -1, -1, "white-pawn", "black-pawn"); 
-            }
+            (row%2 == 0) ? pawnMovementCalculation(row, tile, -1, 1, 1, "white-pawn", "black-pawn") : pawnMovementCalculation(row, tile, -1, -1, -1, "white-pawn", "black-pawn");
         }
     }
     lastSelected = selectedTile; // "remembers" the last tile that was selected, this allows to move a capturer to its new position
@@ -99,11 +86,11 @@ function pawnMovementCalculation (r, t, rStep, tStep, doubleTileStep, friend, fo
             if (tiles[r+rStep*2] && tiles[r+rStep*2][t+doubleTileStep] && !tiles[r+rStep*2][t+doubleTileStep].classList.contains(friend) && !tiles[r+rStep*2][t+doubleTileStep].classList.contains(foe)) {
                 capturedArr.push(tiles[r+rStep][t+tStep]);
                 if (!tiles[r+rStep*2][t+doubleTileStep].captured) {
-                    tiles[r+rStep*2][t+doubleTileStep].captured = capturedArr.slice(); // PREVENTS ALIASING!!!   
+                    tiles[r+rStep*2][t+doubleTileStep].captured = capturedArr.slice(); // PREVENTS ALIASING!   
                 }
                 tiles[r+rStep*2][t+doubleTileStep].classList.add("suggested-move");
                 tiles[r+rStep][t+tStep].classList.add("capture");
-                pawnMovementCalculation(r+rStep*2, t+doubleTileStep, rStep, tStep, doubleTileStep, friend, foe, true, capturedArr.slice());
+                pawnMovementCalculation(r+rStep*2, t+doubleTileStep, rStep, tStep, doubleTileStep, friend, foe, true, capturedArr.slice()); // PREVENTS ALIASING! 
                 capturedArr.pop();
             }
         }
@@ -118,11 +105,11 @@ function pawnMovementCalculation (r, t, rStep, tStep, doubleTileStep, friend, fo
             if (tiles[r+rStep*2] && tiles[r+rStep*2][t-doubleTileStep] && !tiles[r+rStep*2][t-doubleTileStep].classList.contains(friend) && !tiles[r+rStep*2][t-doubleTileStep].classList.contains(foe)) {
                 capturedArr.push(tiles[r+rStep][t]);
                 if (!tiles[r+rStep*2][t-doubleTileStep].captured) {
-                    tiles[r+rStep*2][t-doubleTileStep].captured = capturedArr.slice(); // PREVENTS ALIASING!!!   
+                    tiles[r+rStep*2][t-doubleTileStep].captured = capturedArr.slice(); // PREVENTS ALIASING! 
                 }
                 tiles[r+rStep*2][t-doubleTileStep].classList.add("suggested-move");
                 tiles[r+rStep][t].classList.add("capture");
-                pawnMovementCalculation(r+rStep*2, t-doubleTileStep, rStep, tStep, doubleTileStep, friend, foe, true, capturedArr.slice());
+                pawnMovementCalculation(r+rStep*2, t-doubleTileStep, rStep, tStep, doubleTileStep, friend, foe, true, capturedArr.slice()); // PREVENTS ALIASING! 
             }
         }
     }
