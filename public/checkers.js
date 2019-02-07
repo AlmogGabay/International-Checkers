@@ -74,8 +74,8 @@ function clearSuggestionsAndCaptures () {
     }
 }
 
-/* r: row, t: tile, rStep: row step, tStep: tile step */
 function pawnMovementCalculation (r, t, rStep, tStep, doubleTileStep, friend, foe, captureOccured = false, capturedArr = []) {
+    /* FORWARD MOVEMENT */
     if (tiles[r+rStep] && tiles[r+rStep][t+tStep] && !tiles[r+rStep][t+tStep].classList.contains(friend)) { // if not friend
         if (!tiles[r+rStep][t+tStep].classList.contains(foe)) { // if empty
             if (!captureOccured) {
@@ -109,11 +109,79 @@ function pawnMovementCalculation (r, t, rStep, tStep, doubleTileStep, friend, fo
                 }
                 tiles[r+rStep*2][t-doubleTileStep].classList.add("suggested-move");
                 tiles[r+rStep][t].classList.add("capture");
-                pawnMovementCalculation(r+rStep*2, t-doubleTileStep, rStep, tStep, doubleTileStep, friend, foe, true, capturedArr.slice()); // PREVENTS ALIASING! 
+                pawnMovementCalculation(r+rStep*2, t-doubleTileStep, rStep, tStep, doubleTileStep, friend, foe, true, capturedArr.slice()); // PREVENTS ALIASING!
+                capturedArr.pop();
+            }
+        }
+    }
+    /* BACKWARDS MOVEMENT */
+    if (captureOccured) {
+        if (tiles[r-rStep] && tiles[r-rStep][t+tStep] && !tiles[r-rStep][t+tStep].classList.contains(friend) && tiles[r-rStep][t+tStep].classList.contains(foe)) { // if foe
+            if (tiles[r-rStep*2] && tiles[r-rStep*2][t+doubleTileStep] && !tiles[r-rStep*2][t+doubleTileStep].classList.contains(friend) && !tiles[r-rStep*2][t+doubleTileStep].classList.contains(foe) && !tiles[r-rStep*2][t+doubleTileStep].captured) { // .captured prevents infinite recursion
+                capturedArr.push(tiles[r-rStep][t+tStep]);
+                if (!tiles[r-rStep*2][t+doubleTileStep].captured) {
+                    tiles[r-rStep*2][t+doubleTileStep].captured = capturedArr.slice(); // PREVENTS ALIASING!   
+                }
+                tiles[r-rStep*2][t+doubleTileStep].classList.add("suggested-move");
+                tiles[r-rStep][t+tStep].classList.add("capture");
+                pawnMovementCalculation(r-rStep*2, t+doubleTileStep, rStep, tStep, doubleTileStep, friend, foe, true, capturedArr.slice()); // PREVENTS ALIASING! 
+                capturedArr.pop();
+            }
+        }
+        if (tiles[r-rStep] && tiles[r-rStep][t] && !tiles[r-rStep][t].classList.contains(friend) && tiles[r-rStep][t].classList.contains(foe)) { // if foe
+            if (tiles[r-rStep*2] && tiles[r-rStep*2][t-doubleTileStep] && !tiles[r-rStep*2][t-doubleTileStep].classList.contains(friend) && !tiles[r-rStep*2][t-doubleTileStep].classList.contains(foe) && !tiles[r-rStep*2][t-doubleTileStep].captured) {// .captured prevents infinite recursion
+                capturedArr.push(tiles[r-rStep][t]);
+                if (!tiles[r-rStep*2][t-doubleTileStep].captured) {
+                    tiles[r-rStep*2][t-doubleTileStep].captured = capturedArr.slice(); // PREVENTS ALIASING! 
+                }
+                tiles[r-rStep*2][t-doubleTileStep].classList.add("suggested-move");
+                tiles[r-rStep][t].classList.add("capture");
+                pawnMovementCalculation(r-rStep*2, t-doubleTileStep, rStep, tStep, doubleTileStep, friend, foe, true, capturedArr.slice()); // PREVENTS ALIASING! 
             }
         }
     }
 }
+
+/* r: row, t: tile, rStep: row step, tStep: tile step */
+// function pawnMovementCalculation (r, t, rStep, tStep, doubleTileStep, friend, foe, captureOccured = false, capturedArr = []) {
+//     if (tiles[r+rStep] && tiles[r+rStep][t+tStep] && !tiles[r+rStep][t+tStep].classList.contains(friend)) { // if not friend
+//         if (!tiles[r+rStep][t+tStep].classList.contains(foe)) { // if empty
+//             if (!captureOccured) {
+//                 tiles[r+rStep][t+tStep].classList.add("suggested-move"); // a step without a capture
+//             }
+//         }
+//         else { // if foe
+//             if (tiles[r+rStep*2] && tiles[r+rStep*2][t+doubleTileStep] && !tiles[r+rStep*2][t+doubleTileStep].classList.contains(friend) && !tiles[r+rStep*2][t+doubleTileStep].classList.contains(foe)) {
+//                 capturedArr.push(tiles[r+rStep][t+tStep]);
+//                 if (!tiles[r+rStep*2][t+doubleTileStep].captured) {
+//                     tiles[r+rStep*2][t+doubleTileStep].captured = capturedArr.slice(); // PREVENTS ALIASING!   
+//                 }
+//                 tiles[r+rStep*2][t+doubleTileStep].classList.add("suggested-move");
+//                 tiles[r+rStep][t+tStep].classList.add("capture");
+//                 pawnMovementCalculation(r+rStep*2, t+doubleTileStep, rStep, tStep, doubleTileStep, friend, foe, true, capturedArr.slice()); // PREVENTS ALIASING! 
+//                 capturedArr.pop();
+//             }
+//         }
+//     }
+//     if (tiles[r+rStep] && tiles[r+rStep][t] && !tiles[r+rStep][t].classList.contains(friend)) { // if not friend
+//         if (!tiles[r+rStep][t].classList.contains(foe)) { // if empty
+//             if (!captureOccured) {
+//                 tiles[r+rStep][t].classList.add("suggested-move"); // a step without a capture
+//             }
+//         }
+//         else { // if foe
+//             if (tiles[r+rStep*2] && tiles[r+rStep*2][t-doubleTileStep] && !tiles[r+rStep*2][t-doubleTileStep].classList.contains(friend) && !tiles[r+rStep*2][t-doubleTileStep].classList.contains(foe)) {
+//                 capturedArr.push(tiles[r+rStep][t]);
+//                 if (!tiles[r+rStep*2][t-doubleTileStep].captured) {
+//                     tiles[r+rStep*2][t-doubleTileStep].captured = capturedArr.slice(); // PREVENTS ALIASING! 
+//                 }
+//                 tiles[r+rStep*2][t-doubleTileStep].classList.add("suggested-move");
+//                 tiles[r+rStep][t].classList.add("capture");
+//                 pawnMovementCalculation(r+rStep*2, t-doubleTileStep, rStep, tStep, doubleTileStep, friend, foe, true, capturedArr.slice()); // PREVENTS ALIASING! 
+//             }
+//         }
+//     }
+// }
 
 function executeCapture (capturer, captured) {
     if (turn == "black-pawn") {
