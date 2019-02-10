@@ -119,12 +119,9 @@ ul {
     background-image: url(images/black_pawn.png);
 }
 
-.white-king {
-    
-}
-
-.black-king {
-    
+.king {
+    background-color: rgba(229, 255, 0, 0.3);
+    opacity: 0.9;
 }
 
 .suggested-move {
