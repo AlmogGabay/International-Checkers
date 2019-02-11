@@ -196,6 +196,7 @@ function showSuggestions (r, t, rStep, tStep, doubleTileStep, friend, foe, origi
                 capturedArr.push(tiles[r+rStep][t+tStep]);
                 tiles[r+rStep*2][t+doubleTileStep].captured = capturedArr.slice();
                 tiles[r+rStep*2][t+doubleTileStep].classList.add("intermediate-capture");
+                tiles[r+rStep][t+tStep].classList.add("capture");
                 showSuggestions(r+rStep*2, t+doubleTileStep, rStep, tStep, doubleTileStep, friend, foe, originalPawn, true, capturedArr.slice());
                 capturedArr.pop();
             }
@@ -221,6 +222,7 @@ function showSuggestions (r, t, rStep, tStep, doubleTileStep, friend, foe, origi
                 capturedArr.push(tiles[r+rStep][t]);
                 tiles[r+rStep*2][t-doubleTileStep].captured = capturedArr.slice();
                 tiles[r+rStep*2][t-doubleTileStep].classList.add("intermediate-capture");
+                tiles[r+rStep][t].classList.add("capture");
                 showSuggestions(r+rStep*2, t-doubleTileStep, rStep, tStep, doubleTileStep, friend, foe, originalPawn, true, capturedArr.slice());
                 capturedArr.pop();
             }
@@ -232,9 +234,7 @@ function showSuggestions (r, t, rStep, tStep, doubleTileStep, friend, foe, origi
         if (tiles[r-rStep*2] && tiles[r-rStep*2][t+doubleTileStep] && !tiles[r-rStep*2][t+doubleTileStep].captured) { 
             if (!tiles[r-rStep*2][t+doubleTileStep].classList.contains(friend) && !tiles[r-rStep*2][t+doubleTileStep].classList.contains(foe)) {
                 capturedArr.push(tiles[r-rStep][t+tStep]);
-                if (!tiles[r-rStep*2][t+doubleTileStep].captured) {
-                    tiles[r-rStep*2][t+doubleTileStep].captured = capturedArr.slice(); 
-                }
+                tiles[r-rStep*2][t+doubleTileStep].captured = capturedArr.slice(); 
                 tiles[r-rStep*2][t+doubleTileStep].classList.add("intermediate-capture");
                 tiles[r-rStep][t+tStep].classList.add("capture");
                 showSuggestions(r-rStep*2, t+doubleTileStep, rStep, tStep, doubleTileStep, friend, foe, originalPawn, true, capturedArr.slice());
@@ -244,6 +244,7 @@ function showSuggestions (r, t, rStep, tStep, doubleTileStep, friend, foe, origi
                 capturedArr.push(tiles[r-rStep][t+tStep]);
                 tiles[r-rStep*2][t+doubleTileStep].captured = capturedArr.slice();
                 tiles[r-rStep*2][t+doubleTileStep].classList.add("intermediate-capture");
+                tiles[r-rStep][t+tStep].classList.add("capture");
                 showSuggestions(r-rStep*2, t+doubleTileStep, rStep, tStep, doubleTileStep, friend, foe, originalPawn, true, capturedArr.slice());
                 capturedArr.pop();
             }
@@ -254,9 +255,7 @@ function showSuggestions (r, t, rStep, tStep, doubleTileStep, friend, foe, origi
         if (tiles[r-rStep*2] && tiles[r-rStep*2][t-doubleTileStep] && !tiles[r-rStep*2][t-doubleTileStep].captured) {
             if (!tiles[r-rStep*2][t-doubleTileStep].classList.contains(friend) && !tiles[r-rStep*2][t-doubleTileStep].classList.contains(foe)) {
                 capturedArr.push(tiles[r-rStep][t]);
-                if (!tiles[r-rStep*2][t-doubleTileStep].captured) {
-                    tiles[r-rStep*2][t-doubleTileStep].captured = capturedArr.slice();
-                }
+                tiles[r-rStep*2][t-doubleTileStep].captured = capturedArr.slice();
                 tiles[r-rStep*2][t-doubleTileStep].classList.add("intermediate-capture");
                 tiles[r-rStep][t].classList.add("capture");
                 showSuggestions(r-rStep*2, t-doubleTileStep, rStep, tStep, doubleTileStep, friend, foe, originalPawn, true, capturedArr.slice());
@@ -265,6 +264,7 @@ function showSuggestions (r, t, rStep, tStep, doubleTileStep, friend, foe, origi
                 capturedArr.push(tiles[r-rStep][t]);
                 tiles[r-rStep*2][t-doubleTileStep].captured = capturedArr.slice();
                 tiles[r-rStep*2][t-doubleTileStep].classList.add("intermediate-capture");
+                tiles[r-rStep][t].classList.add("capture");
                 showSuggestions(r-rStep*2, t-doubleTileStep, rStep, tStep, doubleTileStep, friend, foe, originalPawn, true, capturedArr.slice());
                 capturedArr.pop();
             }
