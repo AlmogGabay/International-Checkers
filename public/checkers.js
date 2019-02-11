@@ -16,6 +16,7 @@ let tiles = [
     whitePawns = 12,
     blackPawns = 12,
     lastSelected,
+    captureFlag = false,
     setPawns = {
         white: tile => tile.classList.add("white-pawn"),
         black: tile => tile.classList.add("black-pawn")
@@ -57,37 +58,54 @@ function checkMovement (selectedTile, row, tile) {
         printTurn.textContent = turn;
     }
     clearSuggestionsAndCaptures();
-    if (selectedTile.classList.contains(turn)) { // if a tile which has a pawn on it is selected
-        if (turn == "white-pawn") { // white turn
-            if (selectedTile.classList.contains("king")) {
-                
-            }
-            else {
-                (row%2 == 0) ? pawnMovementCalculation(row, tile, 1, 1, 1, "white-pawn", "black-pawn") : pawnMovementCalculation(row, tile, 1, -1, -1, "white-pawn", "black-pawn");
-            }
-        }
-        else { // black turn
-            if (selectedTile.classList.contains("king")) {
-                
-            }
-            else {
-                (row%2 == 0) ? pawnMovementCalculation(row, tile, -1, 1, 1, "black-pawn", "white-pawn") : pawnMovementCalculation(row, tile, -1, -1, -1, "black-pawn", "white-pawn");   
-            }
-        }
+    if (selectedTile.classList.contains(turn)) { // if a tile which has a current-turn-pawn on it is selected
+        preShowSuggestions(selectedTile, row, tile);
     }
     lastSelected = selectedTile; // "remembers" the last tile that was selected, this allows to move a capturer to its new position
+}
+
+function preShowSuggestions (selectedTile, row, tile) {
+    if (turn == "white-pawn") { // white turn
+        if (selectedTile.classList.contains("king")) {
+            
+        }
+        else {
+            (row%2 == 0) ? showSuggestions(row, tile, 1, 1, 1, "white-pawn", "black-pawn", selectedTile) : showSuggestions(row, tile, 1, -1, -1, "white-pawn", "black-pawn", selectedTile);
+        }
+    }
+    else { // black turn
+        if (selectedTile.classList.contains("king")) {
+            
+        }
+        else {
+            (row%2 == 0) ? showSuggestions(row, tile, -1, 1, 1, "black-pawn", "white-pawn", selectedTile) : showSuggestions(row, tile, -1, -1, -1, "black-pawn", "white-pawn", selectedTile);   
+        }
+    }
+    if (captureFlag) {
+        let stepTiles = Array.prototype.slice.call(document.querySelectorAll(".suggested-move")),
+        captureTiles = Array.prototype.slice.call(document.querySelectorAll(".intermediate-capture"));
+        stepTiles.forEach((tile) => {tile.classList.remove("suggested-move")}); // if theres a capture, remove all step tiles
+        captureTiles // leave only the max length captures
+        .sort((a, b) => b.captured.length - a.captured.length)
+        .filter(tile => tile.captured.length == captureTiles[0].captured.length)
+        .forEach(tile => {
+            tile.classList.remove("intermediate-capture");
+            tile.classList.add("suggested-move");
+        });
+    }
+    captureFlag = false;
 }
 
 function clearSuggestionsAndCaptures () {
     for (let i = 1; i < tiles.length; i++) {
         for (let j = 0; j < 4; j++) {
-            tiles[i][j].classList.remove("suggested-move", "capture");
+            tiles[i][j].classList.remove("suggested-move", "intermediate-capture", "capture");
             delete tiles[i][j].captured;
         }
     }
 }
 
-function pawnMovementCalculation (r, t, rStep, tStep, doubleTileStep, friend, foe, captureOccured = false, capturedArr = []) {
+function showSuggestions (r, t, rStep, tStep, doubleTileStep, friend, foe, originalPawn, captureOccured = false, capturedArr = []) {
     /* FORWARD MOVEMENT */
     if (tiles[r+rStep] && tiles[r+rStep][t+tStep] && !tiles[r+rStep][t+tStep].classList.contains(friend)) { // if not friend
         if (!tiles[r+rStep][t+tStep].classList.contains(foe)) { // if empty
@@ -101,13 +119,22 @@ function pawnMovementCalculation (r, t, rStep, tStep, doubleTileStep, friend, fo
                 if (!tiles[r+rStep*2][t+doubleTileStep].captured) {
                     tiles[r+rStep*2][t+doubleTileStep].captured = capturedArr.slice(); // PREVENTS ALIASING!   
                 }
-                tiles[r+rStep*2][t+doubleTileStep].classList.add("suggested-move");
+                tiles[r+rStep*2][t+doubleTileStep].classList.add("intermediate-capture");
                 tiles[r+rStep][t+tStep].classList.add("capture");
-                pawnMovementCalculation(r+rStep*2, t+doubleTileStep, rStep, tStep, doubleTileStep, friend, foe, true, capturedArr.slice()); // PREVENTS ALIASING! 
+                showSuggestions(r+rStep*2, t+doubleTileStep, rStep, tStep, doubleTileStep, friend, foe, originalPawn, true, capturedArr.slice()); // PREVENTS ALIASING!
                 capturedArr.pop();
             }
         }
     }
+    else { // if friend
+        if (tiles[r+rStep*2][t+doubleTileStep] == originalPawn && capturedArr.length > 3) { // a perfect diamond scenario 
+            capturedArr.push(tiles[r+rStep][t+tStep]);
+            tiles[r+rStep*2][t+doubleTileStep].captured = capturedArr.slice();
+            tiles[r+rStep*2][t+doubleTileStep].classList.add("intermediate-capture");
+            return;
+        }
+    }
+    
     if (tiles[r+rStep] && tiles[r+rStep][t] && !tiles[r+rStep][t].classList.contains(friend)) { // if not friend
         if (!tiles[r+rStep][t].classList.contains(foe)) { // if empty
             if (!captureOccured) {
@@ -120,9 +147,9 @@ function pawnMovementCalculation (r, t, rStep, tStep, doubleTileStep, friend, fo
                 if (!tiles[r+rStep*2][t-doubleTileStep].captured) {
                     tiles[r+rStep*2][t-doubleTileStep].captured = capturedArr.slice(); // PREVENTS ALIASING! 
                 }
-                tiles[r+rStep*2][t-doubleTileStep].classList.add("suggested-move");
+                tiles[r+rStep*2][t-doubleTileStep].classList.add("intermediate-capture");
                 tiles[r+rStep][t].classList.add("capture");
-                pawnMovementCalculation(r+rStep*2, t-doubleTileStep, rStep, tStep, doubleTileStep, friend, foe, true, capturedArr.slice()); // PREVENTS ALIASING!
+                showSuggestions(r+rStep*2, t-doubleTileStep, rStep, tStep, doubleTileStep, friend, foe, originalPawn, true, capturedArr.slice()); // PREVENTS ALIASING!
                 capturedArr.pop();
             }
         }
@@ -134,23 +161,25 @@ function pawnMovementCalculation (r, t, rStep, tStep, doubleTileStep, friend, fo
             if (!tiles[r-rStep*2][t+doubleTileStep].captured) {
                 tiles[r-rStep*2][t+doubleTileStep].captured = capturedArr.slice(); // PREVENTS ALIASING!   
             }
-            tiles[r-rStep*2][t+doubleTileStep].classList.add("suggested-move");
+            tiles[r-rStep*2][t+doubleTileStep].classList.add("intermediate-capture");
             tiles[r-rStep][t+tStep].classList.add("capture");
-            pawnMovementCalculation(r-rStep*2, t+doubleTileStep, rStep, tStep, doubleTileStep, friend, foe, true, capturedArr.slice()); // PREVENTS ALIASING! 
+            showSuggestions(r-rStep*2, t+doubleTileStep, rStep, tStep, doubleTileStep, friend, foe, originalPawn, true, capturedArr.slice()); // PREVENTS ALIASING!
             capturedArr.pop();
         }
     }
+    
     if (tiles[r-rStep] && tiles[r-rStep][t] && !tiles[r-rStep][t].classList.contains(friend) && tiles[r-rStep][t].classList.contains(foe)) { // if foe
         if (tiles[r-rStep*2] && tiles[r-rStep*2][t-doubleTileStep] && !tiles[r-rStep*2][t-doubleTileStep].classList.contains(friend) && !tiles[r-rStep*2][t-doubleTileStep].classList.contains(foe) && !tiles[r-rStep*2][t-doubleTileStep].captured) {// .captured prevents infinite recursion
             capturedArr.push(tiles[r-rStep][t]);
             if (!tiles[r-rStep*2][t-doubleTileStep].captured) {
                 tiles[r-rStep*2][t-doubleTileStep].captured = capturedArr.slice(); // PREVENTS ALIASING! 
             }
-            tiles[r-rStep*2][t-doubleTileStep].classList.add("suggested-move");
+            tiles[r-rStep*2][t-doubleTileStep].classList.add("intermediate-capture");
             tiles[r-rStep][t].classList.add("capture");
-            pawnMovementCalculation(r-rStep*2, t-doubleTileStep, rStep, tStep, doubleTileStep, friend, foe, true, capturedArr.slice()); // PREVENTS ALIASING! 
+            showSuggestions(r-rStep*2, t-doubleTileStep, rStep, tStep, doubleTileStep, friend, foe, originalPawn, true, capturedArr.slice()); // PREVENTS ALIASING!
         }
     }
+    if (captureOccured) captureFlag = true;
 }
 
 function executeCapture (captured) {

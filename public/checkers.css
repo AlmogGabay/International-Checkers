@@ -130,6 +130,12 @@ ul {
     transition: background-color 0.2s;
 }
 
+.intermediate-capture {
+    background-color: rgb(255, 255, 0);
+    opacity: 0.1;
+    transition: background-color 0.2s;
+}
+
 .capture {
     background-color: red;
     opacity: 0.8;
