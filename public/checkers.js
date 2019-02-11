@@ -183,97 +183,94 @@ function showSuggestions (r, t, rStep, tStep, doubleTileStep, friend, foe, origi
                 tiles[r+rStep][t+tStep].classList.add("suggested-move"); // a step without a capture
             }
         }
-        else if (tiles[r+rStep*2] && tiles[r+rStep*2][t+doubleTileStep]) { // if next tile exists
-            if (!tiles[r+rStep*2][t+doubleTileStep].classList.contains(friend) && !tiles[r+rStep*2][t+doubleTileStep].classList.contains(foe)) { // if next is empty
-                capturedArr.push(tiles[r+rStep][t+tStep]);
-                if (!tiles[r+rStep*2][t+doubleTileStep].captured) {
-                    tiles[r+rStep*2][t+doubleTileStep].captured = capturedArr.slice(); // PREVENTS ALIASING!   
-                }
-                tiles[r+rStep*2][t+doubleTileStep].classList.add("intermediate-capture");
-                tiles[r+rStep][t+tStep].classList.add("capture");
-                showSuggestions(r+rStep*2, t+doubleTileStep, rStep, tStep, doubleTileStep, friend, foe, originalPawn, true, capturedArr.slice()); // PREVENTS ALIASING!
-                capturedArr.pop();
-            }
-            else if (tiles[r+rStep*2][t+doubleTileStep] == originalPawn && capturedArr.length >= 3 && !tiles[r+rStep*2][t+doubleTileStep].captured) { // if next equals pressed pawn AND a perfect diamond scenario AND doesn't have captured
+        else if (tiles[r+rStep*2] && tiles[r+rStep*2][t+doubleTileStep] && !tiles[r+rStep*2][t+doubleTileStep].captured) { // if jump tile exists AND has no captured
+            if (!tiles[r+rStep*2][t+doubleTileStep].classList.contains(friend) && !tiles[r+rStep*2][t+doubleTileStep].classList.contains(foe)) { // if jump tile is empty
                 capturedArr.push(tiles[r+rStep][t+tStep]);
                 tiles[r+rStep*2][t+doubleTileStep].captured = capturedArr.slice();
                 tiles[r+rStep*2][t+doubleTileStep].classList.add("intermediate-capture");
-                showSuggestions(r+rStep*2, t+doubleTileStep, rStep, tStep, doubleTileStep, friend, foe, originalPawn, true, capturedArr.slice()); // PREVENTS ALIASING!
+                tiles[r+rStep][t+tStep].classList.add("capture");
+                showSuggestions(r+rStep*2, t+doubleTileStep, rStep, tStep, doubleTileStep, friend, foe, originalPawn, true, capturedArr.slice());
+                capturedArr.pop();
+            }
+            else if (tiles[r+rStep*2][t+doubleTileStep] == originalPawn && capturedArr.length >= 3) { // if jump tile equals pressed pawn AND a perfect diamond scenario AND jump tile doesn't have captured
+                capturedArr.push(tiles[r+rStep][t+tStep]);
+                tiles[r+rStep*2][t+doubleTileStep].captured = capturedArr.slice();
+                tiles[r+rStep*2][t+doubleTileStep].classList.add("intermediate-capture");
+                showSuggestions(r+rStep*2, t+doubleTileStep, rStep, tStep, doubleTileStep, friend, foe, originalPawn, true, capturedArr.slice());
                 capturedArr.pop();
             }
         }
     }
     
-    if (tiles[r+rStep] && tiles[r+rStep][t] && !tiles[r+rStep][t].classList.contains(friend)) { // if not friend
-        if (!tiles[r+rStep][t].classList.contains(foe)) { // if empty
+    if (tiles[r+rStep] && tiles[r+rStep][t] && !tiles[r+rStep][t].classList.contains(friend)) {
+        if (!tiles[r+rStep][t].classList.contains(foe)) {
             if (!captureOccured) {
-                tiles[r+rStep][t].classList.add("suggested-move"); // a step without a capture
+                tiles[r+rStep][t].classList.add("suggested-move");
             }
         }
-        else if (tiles[r+rStep*2] && tiles[r+rStep*2][t-doubleTileStep]) { // if next tile exists
+        else if (tiles[r+rStep*2] && tiles[r+rStep*2][t-doubleTileStep] && !tiles[r+rStep*2][t-doubleTileStep].captured) {
             if (!tiles[r+rStep*2][t-doubleTileStep].classList.contains(friend) && !tiles[r+rStep*2][t-doubleTileStep].classList.contains(foe)) {
-                capturedArr.push(tiles[r+rStep][t]);
-                if (!tiles[r+rStep*2][t-doubleTileStep].captured) {
-                    tiles[r+rStep*2][t-doubleTileStep].captured = capturedArr.slice(); // PREVENTS ALIASING! 
-                }
-                tiles[r+rStep*2][t-doubleTileStep].classList.add("intermediate-capture");
-                tiles[r+rStep][t].classList.add("capture");
-                showSuggestions(r+rStep*2, t-doubleTileStep, rStep, tStep, doubleTileStep, friend, foe, originalPawn, true, capturedArr.slice()); // PREVENTS ALIASING!
-                capturedArr.pop();
-            }
-            else if (tiles[r+rStep*2][t-doubleTileStep] == originalPawn && capturedArr.length >= 3 && !tiles[r+rStep*2][t-doubleTileStep].captured) { // if next is pressed pawn AND a perfect diamond scenario AND doesn't have captured
                 capturedArr.push(tiles[r+rStep][t]);
                 tiles[r+rStep*2][t-doubleTileStep].captured = capturedArr.slice();
                 tiles[r+rStep*2][t-doubleTileStep].classList.add("intermediate-capture");
-                showSuggestions(r+rStep*2, t-doubleTileStep, rStep, tStep, doubleTileStep, friend, foe, originalPawn, true, capturedArr.slice()); // PREVENTS ALIASING!
+                tiles[r+rStep][t].classList.add("capture");
+                showSuggestions(r+rStep*2, t-doubleTileStep, rStep, tStep, doubleTileStep, friend, foe, originalPawn, true, capturedArr.slice());
+                capturedArr.pop();
+            }
+            else if (tiles[r+rStep*2][t-doubleTileStep] == originalPawn && capturedArr.length >= 3) {
+                capturedArr.push(tiles[r+rStep][t]);
+                tiles[r+rStep*2][t-doubleTileStep].captured = capturedArr.slice();
+                tiles[r+rStep*2][t-doubleTileStep].classList.add("intermediate-capture");
+                showSuggestions(r+rStep*2, t-doubleTileStep, rStep, tStep, doubleTileStep, friend, foe, originalPawn, true, capturedArr.slice());
                 capturedArr.pop();
             }
         }
     }
     
     /* BACKWARDS MOVEMENT */
-    if (tiles[r-rStep] && tiles[r-rStep][t+tStep] && !tiles[r-rStep][t+tStep].classList.contains(friend) && tiles[r-rStep][t+tStep].classList.contains(foe)) { // if foe
+    if (tiles[r-rStep] && tiles[r-rStep][t+tStep] && !tiles[r-rStep][t+tStep].classList.contains(friend) && tiles[r-rStep][t+tStep].classList.contains(foe)) {
         if (tiles[r-rStep*2] && tiles[r-rStep*2][t+doubleTileStep] && !tiles[r-rStep*2][t+doubleTileStep].captured) { 
-            if (!tiles[r-rStep*2][t+doubleTileStep].classList.contains(friend) && !tiles[r-rStep*2][t+doubleTileStep].classList.contains(foe)) { // .captured prevents infinite recursion
+            if (!tiles[r-rStep*2][t+doubleTileStep].classList.contains(friend) && !tiles[r-rStep*2][t+doubleTileStep].classList.contains(foe)) {
                 capturedArr.push(tiles[r-rStep][t+tStep]);
                 if (!tiles[r-rStep*2][t+doubleTileStep].captured) {
-                    tiles[r-rStep*2][t+doubleTileStep].captured = capturedArr.slice(); // PREVENTS ALIASING!   
+                    tiles[r-rStep*2][t+doubleTileStep].captured = capturedArr.slice(); 
                 }
                 tiles[r-rStep*2][t+doubleTileStep].classList.add("intermediate-capture");
                 tiles[r-rStep][t+tStep].classList.add("capture");
-                showSuggestions(r-rStep*2, t+doubleTileStep, rStep, tStep, doubleTileStep, friend, foe, originalPawn, true, capturedArr.slice()); // PREVENTS ALIASING!
+                showSuggestions(r-rStep*2, t+doubleTileStep, rStep, tStep, doubleTileStep, friend, foe, originalPawn, true, capturedArr.slice());
                 capturedArr.pop();
             }
-            else if (tiles[r-rStep*2][t+doubleTileStep] == originalPawn && capturedArr.length >= 3) { // if next is pressed pawn AND a perfect diamond scenario AND doesn't have captured
+            else if (tiles[r-rStep*2][t+doubleTileStep] == originalPawn && capturedArr.length >= 3) {
                 capturedArr.push(tiles[r-rStep][t+tStep]);
                 tiles[r-rStep*2][t+doubleTileStep].captured = capturedArr.slice();
                 tiles[r-rStep*2][t+doubleTileStep].classList.add("intermediate-capture");
-                showSuggestions(r-rStep*2, t+doubleTileStep, rStep, tStep, doubleTileStep, friend, foe, originalPawn, true, capturedArr.slice()); // PREVENTS ALIASING!
+                showSuggestions(r-rStep*2, t+doubleTileStep, rStep, tStep, doubleTileStep, friend, foe, originalPawn, true, capturedArr.slice());
                 capturedArr.pop();
             }
         }
     }
     
-    if (tiles[r-rStep] && tiles[r-rStep][t] && !tiles[r-rStep][t].classList.contains(friend) && tiles[r-rStep][t].classList.contains(foe)) { // if foe
+    if (tiles[r-rStep] && tiles[r-rStep][t] && !tiles[r-rStep][t].classList.contains(friend) && tiles[r-rStep][t].classList.contains(foe)) {
         if (tiles[r-rStep*2] && tiles[r-rStep*2][t-doubleTileStep] && !tiles[r-rStep*2][t-doubleTileStep].captured) {
-            if (!tiles[r-rStep*2][t-doubleTileStep].classList.contains(friend) && !tiles[r-rStep*2][t-doubleTileStep].classList.contains(foe)) {// .captured prevents infinite recursion
+            if (!tiles[r-rStep*2][t-doubleTileStep].classList.contains(friend) && !tiles[r-rStep*2][t-doubleTileStep].classList.contains(foe)) {
                 capturedArr.push(tiles[r-rStep][t]);
                 if (!tiles[r-rStep*2][t-doubleTileStep].captured) {
-                    tiles[r-rStep*2][t-doubleTileStep].captured = capturedArr.slice(); // PREVENTS ALIASING! 
+                    tiles[r-rStep*2][t-doubleTileStep].captured = capturedArr.slice();
                 }
                 tiles[r-rStep*2][t-doubleTileStep].classList.add("intermediate-capture");
                 tiles[r-rStep][t].classList.add("capture");
-                showSuggestions(r-rStep*2, t-doubleTileStep, rStep, tStep, doubleTileStep, friend, foe, originalPawn, true, capturedArr.slice()); // PREVENTS ALIASING!
+                showSuggestions(r-rStep*2, t-doubleTileStep, rStep, tStep, doubleTileStep, friend, foe, originalPawn, true, capturedArr.slice());
             }
-            else if (tiles[r-rStep*2][t-doubleTileStep] == originalPawn && capturedArr.length >= 3) { // if next is pressed pawn AND a perfect diamond scenario AND doesn't have captured
+            else if (tiles[r-rStep*2][t-doubleTileStep] == originalPawn && capturedArr.length >= 3) {
                 capturedArr.push(tiles[r-rStep][t]);
                 tiles[r-rStep*2][t-doubleTileStep].captured = capturedArr.slice();
                 tiles[r-rStep*2][t-doubleTileStep].classList.add("intermediate-capture");
-                showSuggestions(r-rStep*2, t-doubleTileStep, rStep, tStep, doubleTileStep, friend, foe, originalPawn, true, capturedArr.slice()); // PREVENTS ALIASING!
+                showSuggestions(r-rStep*2, t-doubleTileStep, rStep, tStep, doubleTileStep, friend, foe, originalPawn, true, capturedArr.slice());
                 capturedArr.pop();
             }
         }
     }
+    
     if (captureOccured) captureFlag = true;
 }
 
