@@ -11,24 +11,38 @@ let tiles = [
         document.querySelectorAll(".eighth")
     ],
     printTurn = document.querySelector("#turn"),
-    startButton = document.querySelector("#start"),
-    turn = "white-pawn", 
-    whitePawns = 12,
-    blackPawns = 12,
+    boardCover = document.querySelector("#board-cover"),
+    startMessage = document.querySelector("#start-message"),
+    gameOverScreen = document.querySelector("#gameover-screen"),
+    winnerMessage = document.querySelector("#winner-message"),
+    newGameButton = document.querySelector("#newgame-button"),
+    turn, 
+    whitePawns,
+    blackPawns,
     lastSelected,
     setPawns = {
         white: tile => tile.classList.add("white-pawn"),
         black: tile => tile.classList.add("black-pawn")
     };
 
-startButton.addEventListener("click", () => {
-    gameStart();
-    startButton.style.opacity = "0";
-});
-startButton.addEventListener("transitionend", function () { this.style.display = "none" });
+startMessage.addEventListener("click", () => { startMessage.style.display = "none"; boardCover.style.opacity = "0"; });
+boardCover.addEventListener("transitionend", () => boardCover.style.display = "none");
+newGameButton.addEventListener("click", () => { gameStart(); boardCover.style.opacity = "0"; gameOverScreen.style.display = "none"; });
 
-/* Places all the pawns in their initial position */
-function gameStart () { 
+gameStart();
+
+function gameStart () {
+    turn = "white-pawn";
+    whitePawns = 1;
+    blackPawns = 1;
+    lastSelected = undefined;
+    
+/* Clears all previous pawns */
+    for (let row = 1; row < tiles.length; row++) {
+        tiles[row].forEach((tile) => tile.classList.remove("white-pawn", "black-pawn", "king"));
+    }
+
+/* Places all the pawns in their initial position */    
     tiles[1].forEach(setPawns.white);
     tiles[2].forEach(setPawns.white);
     tiles[3].forEach(setPawns.white);
@@ -36,10 +50,9 @@ function gameStart () {
     tiles[7].forEach(setPawns.black);
     tiles[8].forEach(setPawns.black);
     printTurn.textContent = turn;
-    for (let i = 1; i < tiles.length; i++) {
-        for (let j = 0; j < 4; j++) {
-            tiles[i][j].addEventListener("click", function() { checkMovement(this, i, j); });
-        }
+    
+    for (let row = 1; row < tiles.length; row++) {
+        tiles[row].forEach((tile, index) => tile.addEventListener("click", function() { checkMovement(tile, row, index) }));
     }
 }
 
@@ -64,6 +77,7 @@ function checkMovement (selectedTile, row, tile) {
     if (selectedTile.classList.contains(turn)) { // if a tile which has a current-turn-pawn on it is selected
         preShowSuggestions(selectedTile, row, tile);
     }
+    checkGameOver();
     lastSelected = selectedTile; // "remembers" the last tile that was selected, this allows to move a capturer to its new position
 }
 
@@ -77,9 +91,7 @@ function preShowSuggestions (selectedTile, row, tile) {
     let stepTiles = Array.prototype.slice.call(document.querySelectorAll(".suggested-move")),
         captureTiles = Array.prototype.slice.call(document.querySelectorAll(".intermediate-capture"));
     if (captureTiles.length > 0) { // if theres a capture
-        if (!selectedTile.classList.contains("king")) {
-            stepTiles.forEach((tile) => {tile.classList.remove("suggested-move")}); // remove all step tiles   
-        }
+        stepTiles.forEach((tile) => {tile.classList.remove("suggested-move")}); // remove all step tiles   
         captureTiles // leave only the max length captures
         .sort((a, b) => b.captured.length - a.captured.length)
         .filter(tile => tile.captured.length == captureTiles[0].captured.length)
@@ -102,12 +114,9 @@ function clearSuggestionsAndCaptures () {
 function showSuggestions (r, t, rStep, tStep, doubleTileStep, friend, foe, originalPawn, captureOccured = false, capturedArr = []) {
     /* FORWARD MOVEMENT */
     if (tiles[r+rStep] && tiles[r+rStep][t+tStep] && !tiles[r+rStep][t+tStep].classList.contains(friend)) { // if not friend
-        if (!tiles[r+rStep][t+tStep].classList.contains(foe) && !tiles[r+rStep][t+tStep].classList.contains("suggested-move")) { // if empty and the pressed pawn is not a king
+        if (!tiles[r+rStep][t+tStep].classList.contains(foe)) { // if empty and the pressed pawn is not a king
             if (!captureOccured || originalPawn.classList.contains("king")) {
                 tiles[r+rStep][t+tStep].classList.add("suggested-move"); // a step without a capture
-                if (originalPawn.classList.contains("king")) {
-                    showSuggestions(r+rStep, t+tStep, rStep, tStep, doubleTileStep, friend, foe, originalPawn, true, capturedArr.slice());
-                }
             }
         }
         else if (tiles[r+rStep*2] && tiles[r+rStep*2][t+doubleTileStep] && !tiles[r+rStep*2][t+doubleTileStep].captured) { // if jump tile exists AND has no captured
@@ -121,12 +130,9 @@ function showSuggestions (r, t, rStep, tStep, doubleTileStep, friend, foe, origi
     }
     
     if (tiles[r+rStep] && tiles[r+rStep][t] && !tiles[r+rStep][t].classList.contains(friend)) {
-        if (!tiles[r+rStep][t].classList.contains(foe) && !tiles[r+rStep][t].classList.contains("suggested-move")) {
+        if (!tiles[r+rStep][t].classList.contains(foe)) {
             if (!captureOccured || originalPawn.classList.contains("king")) {
                 tiles[r+rStep][t].classList.add("suggested-move");
-                if (originalPawn.classList.contains("king")) {
-                    showSuggestions(r+rStep, t, rStep, tStep, doubleTileStep, friend, foe, originalPawn, true, capturedArr.slice());
-                }
             }
         }
         else if (tiles[r+rStep*2] && tiles[r+rStep*2][t-doubleTileStep] && !tiles[r+rStep*2][t-doubleTileStep].captured) {
@@ -139,8 +145,8 @@ function showSuggestions (r, t, rStep, tStep, doubleTileStep, friend, foe, origi
         }
     }
     
-    /* BACKWARDS MOVEMENT */
-    if (tiles[r-rStep] && tiles[r-rStep][t+tStep] && !tiles[r-rStep][t+tStep].classList.contains(friend) && !tiles[r-rStep][t+tStep].classList.contains("suggested-move")) { 
+    /* BACKWARD MOVEMENT */
+    if (tiles[r-rStep] && tiles[r-rStep][t+tStep] && !tiles[r-rStep][t+tStep].classList.contains(friend)) { 
         if (tiles[r-rStep][t+tStep].classList.contains(foe)) {
             if (tiles[r-rStep*2] && tiles[r-rStep*2][t+doubleTileStep] && !tiles[r-rStep*2][t+doubleTileStep].captured) { 
                 if (!tiles[r-rStep*2][t+doubleTileStep].classList.contains(friend) && !tiles[r-rStep*2][t+doubleTileStep].classList.contains(foe) || tiles[r-rStep*2][t+doubleTileStep] == originalPawn && capturedArr.length >= 3) {
@@ -153,11 +159,10 @@ function showSuggestions (r, t, rStep, tStep, doubleTileStep, friend, foe, origi
         }
         else if (originalPawn.classList.contains("king")) {
             tiles[r-rStep][t+tStep].classList.add("suggested-move");
-            showSuggestions(r-rStep, t+tStep, rStep, tStep, doubleTileStep, friend, foe, originalPawn, true, capturedArr.slice());
         }
     }
     
-    if (tiles[r-rStep] && tiles[r-rStep][t] && !tiles[r-rStep][t].classList.contains(friend) && !tiles[r-rStep][t].classList.contains("suggested-move")) { 
+    if (tiles[r-rStep] && tiles[r-rStep][t] && !tiles[r-rStep][t].classList.contains(friend)) { 
         if (tiles[r-rStep][t].classList.contains(foe)) {
             if (tiles[r-rStep*2] && tiles[r-rStep*2][t-doubleTileStep] && !tiles[r-rStep*2][t-doubleTileStep].captured) {
                 if (!tiles[r-rStep*2][t-doubleTileStep].classList.contains(friend) && !tiles[r-rStep*2][t-doubleTileStep].classList.contains(foe) || tiles[r-rStep*2][t-doubleTileStep] == originalPawn && capturedArr.length >= 3) {
@@ -169,7 +174,6 @@ function showSuggestions (r, t, rStep, tStep, doubleTileStep, friend, foe, origi
         }
         else if (originalPawn.classList.contains("king")) {
             tiles[r-rStep][t].classList.add("suggested-move");
-            showSuggestions(r-rStep, t, rStep, tStep, doubleTileStep, friend, foe, originalPawn, true, capturedArr.slice());
         }
     }
 }
@@ -182,9 +186,25 @@ function markTiles (r, t, rJump, tJump, rCap, tCap, capturedArr) {
 
 function executeCapture (captured) {
     if (turn == "white-pawn") {
-        captured.forEach(captured => {captured.classList.remove("black-pawn", "king"); blackPawns--;}); 
+        captured.forEach(captured => { captured.classList.remove("black-pawn", "king"); blackPawns--; }); 
     }
     else {
-        captured.forEach(captured => {captured.classList.remove("white-pawn", "king"); whitePawns--;});
+        captured.forEach(captured => { captured.classList.remove("white-pawn", "king"); whitePawns--; });
+    }
+}
+
+function checkGameOver () {
+    if (whitePawns == 0 || blackPawns == 0) {
+        let winner;
+        if (whitePawns == 0) {
+            winner = "Black";
+        }
+        else if (blackPawns == 0) {
+            winner = "White";
+        }
+        boardCover.style.display = "block";
+        boardCover.style.opacity = "0.4";
+        gameOverScreen.style.display = "block";
+        winnerMessage.textContent = winner + " Player Won!";
     }
 }
