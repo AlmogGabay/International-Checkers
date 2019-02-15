@@ -23,9 +23,7 @@ body {
     border: 2px solid black;
 }
 
-#start-message {
-    z-index: 2;
-    font-size: 4em;
+#board {
     position: absolute;
     left: 50%;
     margin-left: -425px;
@@ -33,11 +31,59 @@ body {
     margin-top: -425px;
     width: 850px;
     height: 850px;
-    padding-top: 385px;
+    background-color: rgb(40, 40, 40);
+    filter: blur(1px);
+    transition: filter linear 0.5s;
+}
+
+#inner-border {
+    width: 90%;
+    height: 90%;
+    position: absolute;
+    top: 5%;
+    left: 5%;
+    background-color: rgb(255, 245, 198);
+    border: 10px solid rgb(100, 100, 100);
     box-sizing: border-box;
+}
+
+#inner-border div {
+    width: 12.5%;
+    height: 12.5%;
+    float: left;
+    background-position: center;
+    background-size: cover;
+}
+
+#start-screen {
+    z-index: 1;
+    position: absolute;
+    left: 50%;
+    margin-left: -425px;
+    top: 50%;
+    margin-top: -425px;
+    width: 850px;
+    height: 850px;
     text-align: center;
-    color: white;
+}
+
+#play-button {
+    z-index: 2;
+    display: inline-block;
+    position: absolute;
+    left: 50%;
+    margin-left: -55px;
+    top: 50%;
+    margin-top: -65px;
+    font-size: 7em;
+    color: black;
+    -webkit-text-stroke: 2px white;
+    text-shadow: 2px 2px 0 black;
     user-select: none;
+}
+
+#play-button:hover {
+    color: white;
 }
 
 #gameover-screen {
@@ -75,65 +121,13 @@ body {
     background-color: rgba(124, 174, 255, 0.8);
 }
 
-#board-cover {
-    z-index: 1;
-    position: absolute;
-    left: 50%;
-    margin-left: -425px;
-    top: 50%;
-    margin-top: -425px;
-    width: 850px;
-    height: 850px;
-    background-color: black;
-    opacity: 0.8;
-    transition: opacity 0.5s;
-}
-
-#outer-border {
-    position: absolute;
-    left: 50%;
-    margin-left: -425px;
-    top: 50%;
-    margin-top: -425px;
-    width: 850px;
-    height: 850px;
-    background-color: rgb(40, 40, 40);
-}
-
 ul {
     list-style: none;
     position: absolute;
+    margin: 0;
     text-align: center;
     padding: 0;
     color: white;
-}
-
-#left {
-    height: 91.2%;
-    left: 2%;
-    top: 7%;
-}
-
-#bottom {
-    width: 91.2%;
-    bottom: 0;
-    left: 5%;
-}
-
-#right {
-    height: 91.2%;
-    right: 2%;
-    top: 7%;
-}
-
-#top {
-    width: 91.2%;
-    top: 0;
-    left: 5%;
-}
-
-#left li, #right li {
-    height: 12.5%;
 }
 
 #top li, #bottom li {
@@ -141,23 +135,37 @@ ul {
     width: 12.5%;
 }
 
-#inner-border {
-    width: 90%;
-    height: 90%;
-    position: absolute;
-    top: 5%;
-    left: 5%;
-    background-color: rgb(255, 245, 198);
-    border: 10px solid rgb(100, 100, 100);
-    box-sizing: border-box;
+#left li, #right li {
+    height: 12.5%;
+    line-height: 6;
 }
 
-#inner-border div {
-    width: 12.5%;
-    height: 12.5%;
-    float: left;
-    background-position: center;
-    background-size: cover;
+#top {
+    width: 755px;
+    top: 1.5%;
+    left: 50%;
+    margin-left: -377.5px;
+}
+
+#bottom {
+    width: 755px;
+    bottom: 1.5%;
+    left: 50%;
+    margin-left: -377.5px;
+}
+
+#right {
+    height: 755px;
+    top: 50%;
+    margin-top: -377.5px;
+    right: 2%;
+}
+
+#left {
+    height: 755px;
+    top: 50%;
+    margin-top: -377.5px;
+    left: 2%;
 }
 
 .white-tile {
@@ -198,13 +206,21 @@ ul {
 }
 
 @media screen and (max-width: 1000px) {
-    #start-message {
-        font-size: 1.5em;
-        padding-top: 412px;
+    #board, #start-screen, #gameover-screen {
+        width: 345px;
+        height: 345px;
+        margin-left: -172.05px;
+        margin-top: -172.5px;
+    }
+    
+    #play-button {
+        font-size: 4em;
+        margin-left: -31.5px;
+        margin-top: -37px;
     }
     
     #gameover-screen {
-        padding-top: 295px;   
+        /*padding-top: 295px;   */
     }
     
     #winner-message {
@@ -216,21 +232,43 @@ ul {
         font-size: 0.8em;
     }
     
-    #board-cover {
-        width: 345px;
-        height: 345px;
-        margin-left: -172.5px;
-        margin-top: -172.5px;
-    }
-    
-    #outer-border {
-        width: 345px;
-        height: 345px;
-        margin-left: -172.05px;
-        margin-top: -172.5px;
-    }
-    
     #inner-border {
-        border: 6px solid rgb(45, 45, 45);
+        border: 4px solid rgb(100, 100, 100);
+    }
+    
+    ul {
+        font-size: 0.5em;
+    }
+    
+    #left li, #right li {
+        line-height: 5;
+    }
+    
+    #top {
+        width: 306px;
+        top: 1.5%;
+        left: 50%;
+        margin-left: -151.5px;
+    }
+    
+    #bottom {
+        width: 306px;
+        bottom: 1.5%;
+        left: 50%;
+        margin-left: -151.5px;
+    }
+    
+    #right {
+        height: 306px;
+        top: 50%;
+        margin-top: -151.5px;
+        right: 2%;
+    }
+    
+    #left {
+        height: 306px;
+        top: 50%;
+        margin-top: -151.5px;
+        left: 2%;
     }
 }

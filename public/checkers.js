@@ -11,8 +11,9 @@ let tiles = [
         document.querySelectorAll(".eighth")
     ],
     printTurn = document.querySelector("#turn"),
-    boardCover = document.querySelector("#board-cover"),
-    startMessage = document.querySelector("#start-message"),
+    board = document.querySelector("#board"),
+    startScreen = document.querySelector("#start-screen"),
+    playButton = document.querySelector("#play-button"),
     gameOverScreen = document.querySelector("#gameover-screen"),
     winnerMessage = document.querySelector("#winner-message"),
     newGameButton = document.querySelector("#newgame-button"),
@@ -25,9 +26,8 @@ let tiles = [
         black: tile => tile.classList.add("black-pawn")
     };
 
-startMessage.addEventListener("click", () => { startMessage.style.display = "none"; boardCover.style.opacity = "0"; });
-boardCover.addEventListener("transitionend", () => boardCover.style.display = "none");
-newGameButton.addEventListener("click", () => { gameStart(); boardCover.style.opacity = "0"; gameOverScreen.style.display = "none"; });
+playButton.addEventListener("click", () => { startScreen.style.display = "none"; board.style.filter = "none"; });
+newGameButton.addEventListener("click", () => { gameStart(); board.style.filter = "none"; gameOverScreen.style.display = "none"; });
 
 gameStart();
 
@@ -202,9 +202,8 @@ function checkGameOver () {
         else if (blackPawns == 0) {
             winner = "White";
         }
-        boardCover.style.display = "block";
-        boardCover.style.opacity = "0.4";
         gameOverScreen.style.display = "block";
         winnerMessage.textContent = winner + " Player Won!";
+        board.style.filter = "blur(1px)";
     }
 }
