@@ -12,10 +12,8 @@ let tiles = [
     ],
     printTurn = document.querySelector("#turn"),
     board = document.querySelector("#board"),
-    startScreen = document.querySelector("#start-screen"),
+    coverScreen = document.querySelector("#cover-screen"),
     playButton = document.querySelector("#play-button"),
-    gameOverScreen = document.querySelector("#gameover-screen"),
-    winnerMessage = document.querySelector("#winner-message"),
     newGameButton = document.querySelector("#newgame-button"),
     turn, 
     whitePawns,
@@ -26,15 +24,32 @@ let tiles = [
         black: tile => tile.classList.add("black-pawn")
     };
 
-playButton.addEventListener("click", () => { startScreen.style.display = "none"; board.style.filter = "none"; });
-newGameButton.addEventListener("click", () => { gameStart(); board.style.filter = "none"; gameOverScreen.style.display = "none"; });
+window.addEventListener("resize", positionElements);
+playButton.addEventListener("click", () => { playButton.style.display = "none"; coverScreen.style.display = "none"; board.style.filter = "none"; });
+newGameButton.addEventListener("click", () => { gameStart(); board.style.filter = "none"; coverScreen.style.display = "none"; newGameButton.style.display = "none;"});
 
+positionElements();
 gameStart();
 
-function gameStart () {
+function positionElements() {
+    resizeComputed(board);
+    resizeComputed(coverScreen);
+    resizeComputed(playButton);
+    resizeComputed(newGameButton);
+}
+
+function resizeComputed(element) {
+    if (element == board || element == coverScreen) {
+        element.style.height = window.getComputedStyle(element).width; // makes the board a perfect responsive square   
+    }
+    element.style.marginLeft = (window.getComputedStyle(element).width.slice(0, -2) / -2) + "px";
+    element.style.marginTop = (window.getComputedStyle(element).height.slice(0, -2) / -2) + "px";
+}
+
+function gameStart() {
     turn = "white-pawn";
-    whitePawns = 1;
-    blackPawns = 1;
+    whitePawns = 12;
+    blackPawns = 12;
     lastSelected = undefined;
     
 /* Clears all previous pawns */
@@ -56,7 +71,7 @@ function gameStart () {
     }
 }
 
-function checkMovement (selectedTile, row, tile) {
+function checkMovement(selectedTile, row, tile) {
     if (selectedTile.classList.contains("suggested-move")) { // if a suggested path is clicked
         if (selectedTile.captured) { // if the clicked tile is a suggested capture
             executeCapture(selectedTile.captured);
@@ -81,7 +96,7 @@ function checkMovement (selectedTile, row, tile) {
     lastSelected = selectedTile; // "remembers" the last tile that was selected, this allows to move a capturer to its new position
 }
 
-function preShowSuggestions (selectedTile, row, tile) {
+function preShowSuggestions(selectedTile, row, tile) {
     if (turn == "white-pawn") { // white turn
         (row%2 == 0) ? showSuggestions(row, tile, 1, 1, 1, "white-pawn", "black-pawn", selectedTile) : showSuggestions(row, tile, 1, -1, -1, "white-pawn", "black-pawn", selectedTile);
     }
@@ -102,7 +117,7 @@ function preShowSuggestions (selectedTile, row, tile) {
     }
 }
 
-function clearSuggestionsAndCaptures () {
+function clearSuggestionsAndCaptures() {
     for (let i = 1; i < tiles.length; i++) {
         for (let j = 0; j < 4; j++) {
             tiles[i][j].classList.remove("suggested-move", "intermediate-capture", "capture");
@@ -111,7 +126,7 @@ function clearSuggestionsAndCaptures () {
     }
 }
 
-function showSuggestions (r, t, rStep, tStep, doubleTileStep, friend, foe, originalPawn, captureOccured = false, capturedArr = []) {
+function showSuggestions(r, t, rStep, tStep, doubleTileStep, friend, foe, originalPawn, captureOccured = false, capturedArr = []) {
     /* FORWARD MOVEMENT */
     if (tiles[r+rStep] && tiles[r+rStep][t+tStep] && !tiles[r+rStep][t+tStep].classList.contains(friend)) { // if not friend
         if (!tiles[r+rStep][t+tStep].classList.contains(foe)) { // if empty and the pressed pawn is not a king
@@ -178,13 +193,13 @@ function showSuggestions (r, t, rStep, tStep, doubleTileStep, friend, foe, origi
     }
 }
 
-function markTiles (r, t, rJump, tJump, rCap, tCap, capturedArr) {
+function markTiles(r, t, rJump, tJump, rCap, tCap, capturedArr) {
     tiles[rJump][tJump].captured = capturedArr;
     tiles[rJump][tJump].classList.add("intermediate-capture");
     tiles[rCap][tCap].classList.add("capture");
 }
 
-function executeCapture (captured) {
+function executeCapture(captured) {
     if (turn == "white-pawn") {
         captured.forEach(captured => { captured.classList.remove("black-pawn", "king"); blackPawns--; }); 
     }
@@ -193,17 +208,11 @@ function executeCapture (captured) {
     }
 }
 
-function checkGameOver () {
+function checkGameOver() {
     if (whitePawns == 0 || blackPawns == 0) {
-        let winner;
-        if (whitePawns == 0) {
-            winner = "Black";
-        }
-        else if (blackPawns == 0) {
-            winner = "White";
-        }
-        gameOverScreen.style.display = "block";
-        winnerMessage.textContent = winner + " Player Won!";
-        board.style.filter = "blur(1px)";
+        coverScreen.style.display = "block";
+        newGameButton.style.display = "inline-block";
+        board.style.filter = "blur(2px)";
+        resizeComputed(newGameButton);
     }
 }
