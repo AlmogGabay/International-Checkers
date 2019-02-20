@@ -9,18 +9,31 @@ body {
     top: 0;
     left: 0;
     z-index: -1;
-    background-image: url(https://cassoni.com/image/catalog/Reflex%20Angelo/ra-neolitico_72_glass-02/ra-neolitico_glass-03.jpg);
+    background-image: url(https://www.pixelstalk.net/wp-content/uploads/2016/10/Best-Dark-Gray-Backgrounds.jpg);
     background-position: center;
     background-repeat: no-repeat;
     background-size: cover;
     background-attachment: fixed;
 }
 
-#turn {
+.knight {
+    width: 15%;
+    max-width: 300px;
+    transition: opacity 0.5s;
+}
+
+#white-knight {
     position: absolute;
-    left: 10%;
-    top: 20%;
-    border: 2px solid black;
+    left: 5%;
+    top: 50%;
+    transform: rotateY(180deg);
+}
+
+#black-knight {
+    position: absolute;
+    top: 50%;
+    right: 5%;
+    filter: invert(100%);
 }
 
 #board {
@@ -31,7 +44,7 @@ body {
     top: 50%;
     background-color: rgb(40, 40, 40);
     filter: blur(2px);
-    transition: filter linear 0.5s;
+    transition: filter 0.4s;
 }
 
 #inner-border {
@@ -79,6 +92,8 @@ body {
 
 #play-button:hover {
     color: white;
+    -webkit-text-stroke: 2px black;
+    
 }
 
 #newgame-button {

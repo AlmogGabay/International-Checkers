@@ -10,7 +10,7 @@ let tiles = [
         document.querySelectorAll(".seventh"),
         document.querySelectorAll(".eighth")
     ],
-    printTurn = document.querySelector("#turn"),
+    knights = document.querySelectorAll(".knight"),
     board = document.querySelector("#board"),
     coverScreen = document.querySelector("#cover-screen"),
     playButton = document.querySelector("#play-button"),
@@ -25,13 +25,14 @@ let tiles = [
     };
 
 window.addEventListener("resize", positionElements);
-playButton.addEventListener("click", () => { playButton.style.display = "none"; coverScreen.style.display = "none"; board.style.filter = "none"; });
-newGameButton.addEventListener("click", () => { gameStart(); board.style.filter = "none"; coverScreen.style.display = "none"; newGameButton.style.display = "none;"});
+playButton.addEventListener("click", () => { playButton.style.display = "none"; coverScreen.style.display = "none"; board.style.filter = "none"; gameStart(); });
+newGameButton.addEventListener("click", () => { gameStart(); board.style.filter = "none"; coverScreen.style.display = "none"; newGameButton.style.display = "none"; gameStart(); });
 
 positionElements();
-gameStart();
 
 function positionElements() {
+    resizeComputed(knights[0]);
+    resizeComputed(knights[1]);
     resizeComputed(board);
     resizeComputed(coverScreen);
     resizeComputed(playButton);
@@ -42,15 +43,19 @@ function resizeComputed(element) {
     if (element == board || element == coverScreen) {
         element.style.height = window.getComputedStyle(element).width; // makes the board a perfect responsive square   
     }
-    element.style.marginLeft = (window.getComputedStyle(element).width.slice(0, -2) / -2) + "px";
+    if (element != knights[0] && element != knights[1]) {
+        element.style.marginLeft = (window.getComputedStyle(element).width.slice(0, -2) / -2) + "px";   
+    }
     element.style.marginTop = (window.getComputedStyle(element).height.slice(0, -2) / -2) + "px";
 }
 
 function gameStart() {
     turn = "white-pawn";
-    whitePawns = 12;
-    blackPawns = 12;
+    whitePawns = 1;
+    blackPawns = 1;
     lastSelected = undefined;
+    knights[0].style.opacity = "1";
+    knights[1].style.opacity = "0.4";
     
 /* Clears all previous pawns */
     for (let row = 1; row < tiles.length; row++) {
@@ -64,7 +69,6 @@ function gameStart() {
     tiles[6].forEach(setPawns.black);
     tiles[7].forEach(setPawns.black);
     tiles[8].forEach(setPawns.black);
-    printTurn.textContent = turn;
     
     for (let row = 1; row < tiles.length; row++) {
         tiles[row].forEach((tile, index) => tile.addEventListener("click", function() { checkMovement(tile, row, index) }));
@@ -85,14 +89,24 @@ function checkMovement(selectedTile, row, tile) {
             selectedTile.classList.add("king");
             lastSelected.classList.remove("king");
         }
-        turn = (turn == "white-pawn") ?  "black-pawn" : "white-pawn"; // switch turns
-        printTurn.textContent = turn;
+        if(!checkGameOver()) {
+            /* Switch turns */
+            if (turn == "white-pawn") {
+                turn = "black-pawn";
+                knights[0].style.opacity = "0.4";
+                knights[1].style.opacity = "1";
+            }
+            else {
+                turn = "white-pawn";
+                knights[0].style.opacity = "1";
+                knights[1].style.opacity = "0.4";
+            }
+        }
     }
     clearSuggestionsAndCaptures();
     if (selectedTile.classList.contains(turn)) { // if a tile which has a current-turn-pawn on it is selected
         preShowSuggestions(selectedTile, row, tile);
     }
-    checkGameOver();
     lastSelected = selectedTile; // "remembers" the last tile that was selected, this allows to move a capturer to its new position
 }
 
@@ -214,5 +228,7 @@ function checkGameOver() {
         newGameButton.style.display = "inline-block";
         board.style.filter = "blur(2px)";
         resizeComputed(newGameButton);
+        return true;
     }
+    return false;
 }
