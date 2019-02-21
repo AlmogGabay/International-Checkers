@@ -174,19 +174,15 @@ body {
 }
 
 @media screen and (max-width: 450px) {
-    .knight {
-        width: 15%;
-    }
-    
     #white-knight {
         left: 50%;
-        top: 5%;
+        top: auto;
+        bottom: 5%;
     }
     
     #black-knight {
         left: 50%;
-        top: auto;
-        bottom: 5%;
+        top: 5%;
         right: auto;
     }
     
