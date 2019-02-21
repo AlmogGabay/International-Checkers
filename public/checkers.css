@@ -24,8 +24,8 @@ body {
 
 #white-knight {
     position: absolute;
-    left: 5%;
     top: 50%;
+    left: 5%;
     transform: rotateY(180deg);
 }
 
@@ -38,7 +38,7 @@ body {
 
 #board {
     width: 90%;
-    max-width: 900px;
+    max-width: 800px;
     position: absolute;
     left: 50%;
     top: 50%;
@@ -69,7 +69,7 @@ body {
 #cover-screen {
     z-index: 1;
     width: 90%;
-    max-width: 900px;
+    max-width: 800px;
     position: absolute;
     padding: 0;
     box-sizing: border-box;
@@ -83,7 +83,7 @@ body {
     position: absolute;
     left: 50%;
     top: 50%;
-    font-size: 7rem;
+    font-size: 6em;
     color: black;
     -webkit-text-stroke: 2px white;
     text-shadow: 2px 2px 0 black;
@@ -101,7 +101,9 @@ body {
     position: absolute;
     left: 50%;
     top: 50%;
-    font-size: 3rem;
+    padding: 8px;
+    box-sizing: border-box;
+    font-size: 3em;
     border: 1px solid rgba(255, 255 ,255, 0.5);
     border-radius: 5px;
     color: white;
@@ -151,10 +153,52 @@ body {
     transition: background-color 0.2s;
 }
 
-@media screen and (max-width: 768px) {
-
+@media screen and (max-width: 1600px) {
+    .knight {
+        width: 10%;
+    }
 }
 
-@media screen and (max-width: 1024px) {
+@media screen and (max-width: 1250px) and (min-width: 451px) {
+    .knight {
+        display: none;
+    }
     
+    #play-button {
+        font-size: 4em;
+    }
+    
+    #newgame-button {
+        font-size: 2em;
+    }
+}
+
+@media screen and (max-width: 450px) {
+    .knight {
+        width: 15%;
+    }
+    
+    #white-knight {
+        left: 50%;
+        top: 5%;
+    }
+    
+    #black-knight {
+        left: 50%;
+        top: auto;
+        bottom: 5%;
+        right: auto;
+    }
+    
+    #inner-border {
+        border-width: 5px;
+    }
+    
+    #play-button {
+        font-size: 3em;
+    }
+    
+    #newgame-button {
+        font-size: 1.5em;
+    }
 }

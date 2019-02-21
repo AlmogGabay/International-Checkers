@@ -40,19 +40,28 @@ function positionElements() {
 }
 
 function resizeComputed(element) {
-    if (element == board || element == coverScreen) {
-        element.style.height = window.getComputedStyle(element).width; // makes the board a perfect responsive square   
+    if (element == knights[0] || element == knights[1]) {
+        if (window.innerWidth <= 450) {
+            element.style.marginTop = "auto";
+            element.style.marginLeft = `${window.getComputedStyle(element).width.slice(0, -2) / -2}px`;
+        } 
+        else {
+            element.style.marginTop = `${window.getComputedStyle(element).height.slice(0 ,-2) / -2}px`;
+        }
     }
-    if (element != knights[0] && element != knights[1]) {
-        element.style.marginLeft = (window.getComputedStyle(element).width.slice(0, -2) / -2) + "px";   
+    else {
+        if (element == board || element == coverScreen) {
+            element.style.height = window.getComputedStyle(element).width; // makes the board a perfect responsive square   
+        }
+        element.style.marginTop = `${window.getComputedStyle(element).height.slice(0, -2) / -2}px`;
+        element.style.marginLeft = `${window.getComputedStyle(element).width.slice(0, -2) / -2}px`;
     }
-    element.style.marginTop = (window.getComputedStyle(element).height.slice(0, -2) / -2) + "px";
 }
 
 function gameStart() {
     turn = "white-pawn";
-    whitePawns = 1;
-    blackPawns = 1;
+    whitePawns = 12;
+    blackPawns = 12;
     lastSelected = undefined;
     knights[0].style.opacity = "1";
     knights[1].style.opacity = "0.4";
