@@ -9,7 +9,8 @@ body {
     top: 0;
     left: 0;
     z-index: -1;
-    background-image: url(https://www.pixelstalk.net/wp-content/uploads/2016/10/Best-Dark-Gray-Backgrounds.jpg);
+    background-image: url(https://dollarfootage.com/wp-content/uploads/2017/05/tetrahedron-particle-field-background-animation-white-1-img.jpg);
+    opacity: 0.4;
     background-position: center;
     background-repeat: no-repeat;
     background-size: cover;
@@ -17,7 +18,7 @@ body {
 }
 
 .knight {
-    width: 15%;
+    width: 10%;
     max-width: 300px;
     transition: opacity 0.5s;
 }
@@ -43,8 +44,7 @@ body {
     left: 50%;
     top: 50%;
     background-color: rgb(40, 40, 40);
-    filter: blur(2px);
-    transition: filter 0.4s;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 }
 
 #inner-border {
@@ -76,6 +76,8 @@ body {
     left: 50%;
     top: 50%;
     text-align: center;
+    background-color: rgba(255, 255, 255, 0.4);
+    transition: background-color 0.5s;
 }
 
 #play-button {
@@ -84,7 +86,7 @@ body {
     left: 50%;
     top: 50%;
     font-size: 6em;
-    color: black;
+    color: gray;
     -webkit-text-stroke: 2px white;
     text-shadow: 2px 2px 0 black;
     user-select: none;
@@ -92,7 +94,7 @@ body {
 
 #play-button:hover {
     color: white;
-    -webkit-text-stroke: 2px black;
+    -webkit-text-stroke: 2px gray;
     
 }
 
@@ -113,7 +115,7 @@ body {
 }
 
 #newgame-button:hover {
-    background-color: rgba(124, 174, 255, 0.4);
+    background-color: rgba(124, 174, 255, 0.2);
 }
 
 .white-tile {
@@ -125,15 +127,23 @@ body {
 }
 
 .white-pawn {
-    background-image: url(images/white_pawn.png);
+    background-image: url(images/white-pawn.png);
 }
 
 .black-pawn {
-    background-image: url(images/black_pawn.png);
+    background-image: url(images/black-pawn.png);
+}
+
+.white-king {
+    background-image: url(images/white-king.png);
+}
+
+.black-king {
+    background-image: url(images/black-king.png);
 }
 
 .king {
-    background-color: rgba(229, 255, 0, 0.3);
+
 }
 
 .suggested-move {
@@ -151,12 +161,6 @@ body {
     background-color: red;
     opacity: 0.8;
     transition: background-color 0.2s;
-}
-
-@media screen and (max-width: 1600px) {
-    .knight {
-        width: 10%;
-    }
 }
 
 @media screen and (max-width: 1250px) and (min-width: 451px) {
