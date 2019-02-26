@@ -1,5 +1,4 @@
-/* Define the entire tiles array which includes all of the black tiles on the board */
-let tiles = [
+let tiles = [ // Defines the entire tiles array which includes all of the black tiles on the board
         undefined,
         document.querySelectorAll(".first"),
         document.querySelectorAll(".second"),
@@ -27,10 +26,10 @@ let tiles = [
 
 window.addEventListener("resize", positionElements);
 playButton.addEventListener("click", () => { playButton.style.display = "none"; rules.style.display = "none"; coverScreen.style.backgroundColor = "rgba(255, 255, 255, 0)"; gameStart(); });
-newGameButton.addEventListener("click", () => { gameStart(); newGameButton.style.display = "none"; coverScreen.style.backgroundColor = "rgba(255, 255, 255, 0)"; gameStart(); });
+newGameButton.addEventListener("click", () => { newGameButton.style.display = "none"; coverScreen.style.backgroundColor = "rgba(255, 255, 255, 0)"; gameStart(); });
 coverScreen.addEventListener("transitionend", () => coverScreen.style.display = "none");
 
-positionElements();
+window.setTimeout(positionElements, 100);
 
 function positionElements() {
     resizeComputed(knights[0]);
@@ -70,7 +69,11 @@ function gameStart() {
     for (let row = 1; row < tiles.length; row++) {
         clearTiles(tiles[row]);
     }
-    /* Places all the pawns in their initial position */    
+    fillPawns();
+}
+
+/* Places all the pawns in their initial position */
+function fillPawns() {
     tiles[1].forEach(setPawns.white);
     tiles[2].forEach(setPawns.white);
     tiles[3].forEach(setPawns.white);
@@ -140,9 +143,9 @@ function checkMovement(selectedTile, row, tile) {
     if (lastSelected) lastSelected.classList.remove("pressed-pawn");
     if (selectedTile[turn] && !checkGameOver()) { // if a tile which has a current-turn-pawn on it is selected (checkGameOver prevents the issue when the final move is clicked twice and shows suggestions even after the game is over)
         preShowSuggestions(selectedTile, row, tile);
-        selectedTile.classList.toggle("pressed-pawn");
+        selectedTile.classList.add("pressed-pawn");
     }
-    lastSelected = selectedTile; // "remembers" the last tile that was selected, this allows to move a capturer to its new position
+    lastSelected = selectedTile; // "remembers" the last tile that was selected, this allows a capturer to move to its new position
 }
 
 function preShowSuggestions(selectedTile, row, tile) {

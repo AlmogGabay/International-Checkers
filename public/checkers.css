@@ -55,16 +55,18 @@ body {
     top: 5%;
     left: 5%;
     background-color: rgb(255, 245, 198);
-    border: 10px solid rgb(100, 100, 100);
+    border: 10px solid rgb(80, 80, 80);
     box-sizing: border-box;
 }
 
+/* Tiles */
 #inner-border div {
     width: 12.5%;
     height: 12.5%;
     float: left;
+    background-size: 95%;
     background-position: center;
-    background-size: cover;
+    background-repeat: no-repeat;
 }
 
 #cover-screen {
@@ -100,6 +102,7 @@ body {
 
 #rules ul {
     list-style: none;
+    font-size: 0.9em;
 }
 
 #rules ul li::before {
@@ -145,11 +148,11 @@ body {
 }
 
 .black-tile {
-    background-color: black;
+    background-color: gray;
 }
 
 .pressed-pawn {
-    background-color: gray;
+    box-shadow: 0.1px 0.1px 4px 0.5px inset;
 }
 
 .white-pawn {
@@ -166,10 +169,6 @@ body {
 
 .black-king {
     background-image: url(images/black-king.png);
-}
-
-.king {
-
 }
 
 .suggested-move {
@@ -195,7 +194,7 @@ body {
     }
     
     #rules {
-        font-size: 2em;
+        font-size: 1.5em;
     }
 
     #play-button, #newgame-button {
@@ -223,7 +222,7 @@ body {
     }
     
     #rules {
-        font-size: 1em;
+        font-size: 0.8em;
     }
     
     #play-button, #newgame-button {
