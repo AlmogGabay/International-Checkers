@@ -10,7 +10,7 @@ body {
     left: 0;
     z-index: -1;
     background-image: url(https://dollarfootage.com/wp-content/uploads/2017/05/tetrahedron-particle-field-background-animation-white-1-img.jpg);
-    opacity: 0.4;
+    opacity: 0.2;
     background-position: center;
     background-repeat: no-repeat;
     background-size: cover;
@@ -21,6 +21,7 @@ body {
     width: 10%;
     max-width: 300px;
     transition: opacity 0.5s;
+    -webkit-box-reflect: below 0px -webkit-gradient(linear, left top, left bottom, from(transparent), color-stop(20%, transparent) , to(rgba(250, 250, 250, 0.2)));
 }
 
 #white-knight {
@@ -75,47 +76,68 @@ body {
     box-sizing: border-box;
     left: 50%;
     top: 50%;
-    text-align: center;
-    background-color: rgba(255, 255, 255, 0.4);
+    background-color: rgba(255, 255, 255, 0.6);
     transition: background-color 0.5s;
 }
 
-#play-button {
+#rules {
+    position: absolute;
+    top: 3%;
     display: inline-block;
+    padding: 0 10%;
+    font-family: 'Cinzel', serif;
+    font-size: 1.8em;
+    font-weight: bold;
+    color: black;
+    -webkit-text-stroke: 0.2px white;
+    user-select: none;
+}
+
+#rules h1 {
+    text-align: center;
+    letter-spacing: 10px;
+}
+
+#rules ul {
+    list-style: none;
+}
+
+#rules ul li::before {
+    content: "\2027";
+    /*color: black;*/
+    display: inline-block;
+    width: 1em;
+    /*margin-left: -1em;*/
+}
+
+#rules a {
+    text-decoration: none;
+}
+
+#play-button, #newgame-button {
     position: absolute;
     left: 50%;
-    top: 50%;
-    font-size: 6em;
-    color: gray;
-    -webkit-text-stroke: 2px white;
+    bottom: 18%;
+    padding: 8px;
+    box-sizing: border-box;
+    border: 1px solid rgba(255, 255 ,255, 0.5);
+    border-radius: 5px;
+    font-size: 3em;
+    color: white;
+    background-color: rgba(255, 255, 255, 0.3);
+    -webkit-text-stroke: 1px gray;
     text-shadow: 2px 2px 0 black;
     user-select: none;
 }
 
-#play-button:hover {
-    color: white;
-    -webkit-text-stroke: 2px gray;
-    
-}
-
 #newgame-button {
     display: none;
-    position: absolute;
-    left: 50%;
+    bottom: auto;
     top: 50%;
-    padding: 8px;
-    box-sizing: border-box;
-    font-size: 3em;
-    border: 1px solid rgba(255, 255 ,255, 0.5);
-    border-radius: 5px;
-    color: white;
-    -webkit-text-stroke: 1px black;
-    background-color: rgba(255, 255, 255, 0.3);
-    user-select: none;
 }
 
-#newgame-button:hover {
-    background-color: rgba(124, 174, 255, 0.2);
+#play-button:hover, #newgame-button:hover {
+    background-color: rgba(0, 0, 0, 0.2);
 }
 
 .white-tile {
@@ -124,6 +146,10 @@ body {
 
 .black-tile {
     background-color: black;
+}
+
+.pressed-pawn {
+    background-color: gray;
 }
 
 .white-pawn {
@@ -168,11 +194,11 @@ body {
         display: none;
     }
     
-    #play-button {
-        font-size: 4em;
+    #rules {
+        font-size: 2em;
     }
-    
-    #newgame-button {
+
+    #play-button, #newgame-button {
         font-size: 2em;
     }
 }
@@ -196,11 +222,11 @@ body {
         border-width: 5px;
     }
     
-    #play-button {
-        font-size: 3em;
+    #rules {
+        font-size: 1em;
     }
     
-    #newgame-button {
+    #play-button, #newgame-button {
         font-size: 1.5em;
     }
 }

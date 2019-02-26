@@ -13,6 +13,7 @@ let tiles = [
     knights = document.querySelectorAll(".knight"),
     board = document.querySelector("#board"),
     coverScreen = document.querySelector("#cover-screen"),
+    rules =document.querySelector("#rules"),
     playButton = document.querySelector("#play-button"),
     newGameButton = document.querySelector("#newgame-button"),
     turn, 
@@ -25,7 +26,7 @@ let tiles = [
     };
 
 window.addEventListener("resize", positionElements);
-playButton.addEventListener("click", () => { playButton.style.display = "none"; coverScreen.style.backgroundColor = "rgba(255, 255, 255, 0)"; gameStart(); });
+playButton.addEventListener("click", () => { playButton.style.display = "none"; rules.style.display = "none"; coverScreen.style.backgroundColor = "rgba(255, 255, 255, 0)"; gameStart(); });
 newGameButton.addEventListener("click", () => { gameStart(); newGameButton.style.display = "none"; coverScreen.style.backgroundColor = "rgba(255, 255, 255, 0)"; gameStart(); });
 coverScreen.addEventListener("transitionend", () => coverScreen.style.display = "none");
 
@@ -65,7 +66,7 @@ function gameStart() {
     blackPawns = 12;
     lastSelected = undefined;
     knights[0].style.opacity = "1";
-    knights[1].style.opacity = "0.4";
+    knights[1].style.opacity = "0.3";
     for (let row = 1; row < tiles.length; row++) {
         clearTiles(tiles[row]);
     }
@@ -125,19 +126,21 @@ function checkMovement(selectedTile, row, tile) {
             /* Switch turns */
             if (turn == "whitePawn") {
                 turn = "blackPawn";
-                knights[0].style.opacity = "0.4";
+                knights[0].style.opacity = "0.3";
                 knights[1].style.opacity = "1";
             }
             else {
                 turn = "whitePawn";
                 knights[0].style.opacity = "1";
-                knights[1].style.opacity = "0.4";
+                knights[1].style.opacity = "0.3";
             }
         }
     }
     clearSuggestionsAndCaptures();
+    if (lastSelected) lastSelected.classList.remove("pressed-pawn");
     if (selectedTile[turn] && !checkGameOver()) { // if a tile which has a current-turn-pawn on it is selected (checkGameOver prevents the issue when the final move is clicked twice and shows suggestions even after the game is over)
         preShowSuggestions(selectedTile, row, tile);
+        selectedTile.classList.toggle("pressed-pawn");
     }
     lastSelected = selectedTile; // "remembers" the last tile that was selected, this allows to move a capturer to its new position
 }
