@@ -29,8 +29,7 @@ playButton.addEventListener("click", () => { playButton.style.display = "none"; 
 newGameButton.addEventListener("click", () => { newGameButton.style.display = "none"; coverScreen.style.backgroundColor = "rgba(255, 255, 255, 0)"; gameStart(); });
 coverScreen.addEventListener("transitionend", () => coverScreen.style.display = "none");
 
-window.setTimeout(positionElements, 50); // prevents the 'unplayable game' issue
-
+positionElements();
 
 /* Calls resizeComputed for each element */
 function positionElements () {
