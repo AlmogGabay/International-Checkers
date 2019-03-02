@@ -30,6 +30,7 @@ newGameButton.addEventListener("click", () => { newGameButton.style.display = "n
 coverScreen.addEventListener("transitionend", () => coverScreen.style.display = "none");
 
 positionElements();
+window.setTimeout(positionElements, 50); // fixes what 'body::before' fails to do
 
 /* Calls resizeComputed for each element */
 function positionElements () {

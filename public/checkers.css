@@ -2,6 +2,16 @@ body {
     margin: 0;
 }
 
+/* 
+ * This should have fixed the issue where pictures are not centered by JS since they have not loaded yet (and therefore might have 0 width), but it does not work, instead i've added a window timeout function.
+ * I've left this here anyway so the pawns could load up immidiately.
+ */
+ body::before {
+    position: absolute;
+    display: none;
+    content: url(images/knight.png) url(images/white-pawn.png) url(images/black-pawn.png) url(images/white-king.png) url(images/black-king.png);
+} 
+
 #background {
     width: 100%;
     height: 100%;
@@ -9,7 +19,7 @@ body {
     top: 0;
     left: 0;
     z-index: -1;
-    background-image: url(https://dollarfootage.com/wp-content/uploads/2017/05/tetrahedron-particle-field-background-animation-white-1-img.jpg);
+    background-image: url(images/background.jpg);
     opacity: 0.2;
     background-position: center;
     background-repeat: no-repeat;
@@ -178,8 +188,8 @@ body {
 }
 
 .intermediate-capture {
-    background-color: rgba(255, 255, 0, 0.1);
-    transition: background-color 0.2s;
+    box-shadow: 0.1px 0.1px 5px 4px inset;
+    transition: box-shadow 0.2s;
 }
 
 .capture {
@@ -222,7 +232,7 @@ body {
     }
     
     #rules {
-        font-size: 0.8em;
+        font-size: 0.7em;
     }
     
     #play-button, #newgame-button {
