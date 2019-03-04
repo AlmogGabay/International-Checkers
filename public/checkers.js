@@ -25,20 +25,22 @@ let tiles = [ // defines the entire tiles array which includes all of the black 
     };
 
 window.addEventListener("resize", positionElements); // makes the board responsive to window resize
-playButton.addEventListener("click", () => { playButton.style.display = "none"; rules.style.display = "none"; coverScreen.style.backgroundColor = "rgba(255, 255, 255, 0)"; gameStart(); });
+playButton.addEventListener("click", () => { 
+    coverScreen.addEventListener("transitionend", () => coverScreen.style.display = "none"); // prevents the 'no coverscreen on first launch' issue
+    playButton.style.display = "none"; rules.style.display = "none"; coverScreen.style.backgroundColor = "rgba(255, 255, 255, 0)"; gameStart(); 
+});
 newGameButton.addEventListener("click", () => { newGameButton.style.display = "none"; coverScreen.style.backgroundColor = "rgba(255, 255, 255, 0)"; gameStart(); });
-coverScreen.addEventListener("transitionend", () => coverScreen.style.display = "none");
 
 positionElements();
 window.setTimeout(positionElements, 50); // fixes what 'body::before' fails to do
 
 /* Calls resizeComputed for each element */
-function positionElements () {
+function positionElements() {
     [knights[0], knights[1], board, coverScreen, playButton, newGameButton].forEach(e => resizeComputed(e));
 }
 
 /* Makes the element dynamically adapt to the window size */
-function resizeComputed (element) {
+function resizeComputed(element) {
     if (element == knights[0] || element == knights[1]) { // if a knight
         if (window.innerWidth <= 450) {
             element.style.marginTop = "auto";
@@ -55,7 +57,7 @@ function resizeComputed (element) {
     }
 }
 
-function gameStart () {
+function gameStart() {
     turn = "whitePawn";
     whitePawns = 12;
     blackPawns = 12;
@@ -69,7 +71,7 @@ function gameStart () {
 }
 
 /* Places all the pawns in their initial position */
-function fillPawns () {
+function fillPawns() {
     tiles[1].forEach(setPawns.white);
     tiles[2].forEach(setPawns.white);
     tiles[3].forEach(setPawns.white);
@@ -82,11 +84,11 @@ function fillPawns () {
 }
 
 /* Clears all previous pawns */
-function clearTiles (tiles) {
+function clearTiles(tiles) {
     tiles.forEach(t => { t.classList.remove("white-pawn", "black-pawn", "white-king", "black-king"); delete t.whitePawn; delete t.blackPawn; delete t.king; });
 }
 
-function checkMovement (selectedTile, row, tile) {
+function checkMovement(selectedTile, row, tile) {
     if (selectedTile.classList.contains("suggested-move")) { // if a suggested path is clicked (a pawn can move only to a suggested path)
         if (selectedTile.captured) executeCapture(selectedTile.captured); // if the clicked tile is a suggested capture path
         if (turn == "whitePawn") { // white turn
@@ -134,7 +136,9 @@ function checkMovement (selectedTile, row, tile) {
         }
     }
     clearSuggestions();
-    if (lastSelected) lastSelected.classList.remove("pressed-pawn");
+    if (lastSelected) { 
+        lastSelected.classList.remove("pressed-pawn");
+    }
     if (selectedTile[turn] && !checkGameOver()) { // if a tile with the  urrent turn pawn on it is selected (checkGameOver prevents the issue when the final move is clicked twice and shows suggestions even after the game is over)
         selectedTile.classList.add("pressed-pawn");
         showSuggestions(selectedTile, row, tile);
@@ -142,7 +146,7 @@ function checkMovement (selectedTile, row, tile) {
     lastSelected = selectedTile; // "remembers" the last tile that was selected, this allows a capturer to move to its new position
 }
 
-function showSuggestions (selectedTile, row, tile) {
+function showSuggestions(selectedTile, row, tile) {
     if (turn == "whitePawn") { // white turn
         (row%2 == 0) ? backtrackMovements(row, tile, 1, 1, 1, "whitePawn", "blackPawn", selectedTile) : backtrackMovements(row, tile, 1, -1, -1, "whitePawn", "blackPawn", selectedTile);
     }
@@ -160,14 +164,14 @@ function showSuggestions (selectedTile, row, tile) {
     }
 }
 
-function clearSuggestions () {
+function clearSuggestions() {
     for (let row = 1; row < tiles.length; row++) {
         tiles[row].forEach(t => { t.classList.remove("suggested-move", "intermediate-capture", "capture"); delete t.captured; });
     }
 }
 
 /* The backtracking recursion which calculates all the possible movements */
-function backtrackMovements (r, t, rStep, tStep, doubleTileStep, friend, foe, originalPawn, captureOccured = false, capturedArr = []) {
+function backtrackMovements(r, t, rStep, tStep, doubleTileStep, friend, foe, originalPawn, captureOccured = false, capturedArr = []) {
     /* FORWARD MOVEMENT */
     if (tiles[r+rStep] && tiles[r+rStep][t+tStep] && !tiles[r+rStep][t+tStep][friend]) { // if not friend
         if (!tiles[r+rStep][t+tStep][foe]) { // if empty and the pressed pawn is not a king
@@ -209,7 +213,9 @@ function backtrackMovements (r, t, rStep, tStep, doubleTileStep, friend, foe, or
                 }
             }
         }
-        else if (originalPawn.king) tiles[r-rStep][t+tStep].classList.add("suggested-move"); // only a king is allowed to move backwards without a capture
+        else if (originalPawn.king) {
+            tiles[r-rStep][t+tStep].classList.add("suggested-move"); // only a king is allowed to move backwards without a capture
+        }
     }
     
     if (tiles[r-rStep] && tiles[r-rStep][t] && !tiles[r-rStep][t][friend]) { 
@@ -222,23 +228,25 @@ function backtrackMovements (r, t, rStep, tStep, doubleTileStep, friend, foe, or
                 }
             }
         }
-        else if (originalPawn.king) tiles[r-rStep][t].classList.add("suggested-move");
+        else if (originalPawn.king) {
+            tiles[r-rStep][t].classList.add("suggested-move");
+        }
     }
 }
 
 /* Colors the possible paths */
-function markTiles (r, t, rJump, tJump, rCap, tCap, capturedArr) { // Cap means 'capture'
+function markTiles(r, t, rJump, tJump, rCap, tCap, capturedArr) { // Cap means 'capture'
     tiles[rJump][tJump].captured = capturedArr;
     tiles[rJump][tJump].classList.add("intermediate-capture");
     tiles[rCap][tCap].classList.add("capture");
 }
 
-function executeCapture (captured) {
+function executeCapture(captured) {
     clearTiles(captured);
     turn == "whitePawn" ? blackPawns -= captured.length : whitePawns -= captured.length;
 }
 
-function checkGameOver () {
+function checkGameOver() {
     if (whitePawns == 0 || blackPawns == 0) {
         coverScreen.style.display = "block";
         coverScreen.style.backgroundColor = "rgba(255, 255, 255, 0.4)";

@@ -2,12 +2,10 @@ body {
     margin: 0;
 }
 
-/* 
- * This should have fixed the issue where pictures are not centered by JS since they have not loaded yet (and therefore might have 0 width), but it does not work, instead i've added a window timeout function.
+/* This should have fixed the issue where pictures are not centered by JS since they have not loaded yet (and therefore might have 0 width), but it does not work, instead i've added a window timeout function.
  * I've left this here anyway so the pawns could load up immidiately.
  */
  body::before {
-    position: absolute;
     display: none;
     content: url(images/knight.png) url(images/white-pawn.png) url(images/black-pawn.png) url(images/white-king.png) url(images/black-king.png);
 } 
@@ -31,7 +29,7 @@ body {
     width: 10%;
     max-width: 300px;
     transition: opacity 0.5s;
-    -webkit-box-reflect: below 0px -webkit-gradient(linear, left top, left bottom, from(transparent), color-stop(20%, transparent) , to(rgba(250, 250, 250, 0.2)));
+    -webkit-box-reflect: below 0px -webkit-gradient(linear, left top, left bottom, from(transparent), color-stop(30%, transparent) , to(rgba(250, 250, 250, 0.2)));
 }
 
 #white-knight {
