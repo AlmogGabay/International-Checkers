@@ -93,7 +93,7 @@ function checkMovement(selectedTile, row, tile) {
         if (selectedTile.captured) executeCapture(selectedTile.captured); // if the clicked tile is a suggested capture path
         if (turn == "whitePawn") { // white turn
             if (lastSelected.king || row == 8) { // if the previously selected pawn is a king or is about to become one
-                delete lastSelected.king; // since selectedTile and lastSelected might be the same (diamond capture scenario), this line has to be here and not outside the big 'if' statement in line 90
+                delete lastSelected.king; // since selectedTile and lastSelected might be the same (diamond capture scenario), this line has to be here and not outside the big 'if' statement in line 92
                 selectedTile.classList.add("white-king");
                 selectedTile.king = true;   
             }

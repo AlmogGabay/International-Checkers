@@ -1,11 +1,16 @@
+:root {
+    font-size: 16px;
+}
+
 body {
     margin: 0;
+    user-select: none;
 }
 
 /* This should have fixed the issue where pictures are not centered by JS since they have not loaded yet (and therefore might have 0 width), but it does not work, instead i've added a window timeout function.
  * I've left this here anyway so the pawns could load up immidiately.
  */
- body::before {
+body::before {
     display: none;
     content: url(images/knight.png) url(images/white-pawn.png) url(images/black-pawn.png) url(images/white-king.png) url(images/black-king.png);
 } 
@@ -53,7 +58,7 @@ body {
     left: 50%;
     top: 50%;
     background-color: rgb(40, 40, 40);
-    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    box-shadow: 0 0.25rem 0.5rem 0 rgba(0, 0, 0, 0.2), 0 0.25rem 0.5rem 0 rgba(0, 0, 0, 0.2);
 }
 
 #inner-border {
@@ -63,7 +68,7 @@ body {
     top: 5%;
     left: 5%;
     background-color: rgb(255, 245, 198);
-    border: 10px solid rgb(80, 80, 80);
+    border: 0.75rem solid rgb(80, 80, 80);
     box-sizing: border-box;
 }
 
@@ -96,32 +101,29 @@ body {
     display: inline-block;
     padding: 0 10%;
     font-family: 'Cinzel', serif;
-    font-size: 1.8em;
-    font-weight: bold;
-    color: black;
-    -webkit-text-stroke: 0.2px white;
-    user-select: none;
+    font-size: 1.8rem;
 }
 
 #rules h1 {
     text-align: center;
-    letter-spacing: 10px;
+    letter-spacing: 1rem;
+    padding-left: 1rem;
 }
 
 #rules ul {
     list-style: none;
-    font-size: 0.9em;
+    font-size: 1.6rem;
 }
 
 #rules ul li::before {
     content: "\2666";
-    /*color: black;*/
     display: inline-block;
-    width: 1em;
-    /*margin-left: -1em;*/
+    width: 1.2rem;
+    /*margin-left: -1rem;*/
 }
 
 #rules a {
+    font-weight: bold;
     text-decoration: none;
 }
 
@@ -129,16 +131,15 @@ body {
     position: absolute;
     left: 50%;
     bottom: 18%;
-    padding: 8px;
+    padding: 0.5rem;
     box-sizing: border-box;
-    border: 1px solid rgba(255, 255 ,255, 0.5);
-    border-radius: 5px;
-    font-size: 3em;
+    border: 0.1rem solid rgba(255, 255 ,255, 0.5);
+    border-radius: 0.5rem;
+    font-size: 3rem;
     color: white;
-    background-color: rgba(255, 255, 255, 0.3);
-    -webkit-text-stroke: 1px gray;
-    text-shadow: 2px 2px 0 black;
-    user-select: none;
+    background-color: rgba(255, 255, 255, 0.5);
+    -webkit-text-stroke: 0.05rem gray;
+    text-shadow: 0.125rem 0.125rem 0 black;
 }
 
 #newgame-button {
@@ -148,7 +149,7 @@ body {
 }
 
 #play-button:hover, #newgame-button:hover {
-    background-color: rgba(0, 0, 0, 0.2);
+    background-color: rgba(0, 0, 0, 0.4);
 }
 
 .white-tile {
@@ -160,7 +161,7 @@ body {
 }
 
 .pressed-pawn {
-    box-shadow: 0.1px 0.1px 4px 0.5px inset;
+    box-shadow: 0.05rem 0.05rem 0.25rem 0.025rem inset;
 }
 
 .white-pawn {
@@ -186,7 +187,7 @@ body {
 }
 
 .intermediate-capture {
-    box-shadow: 0.1px 0.1px 5px 4px inset;
+    box-shadow: 0.05rem 0.05rem 0.2rem 0.2rem inset;
     transition: box-shadow 0.2s;
 }
 
@@ -196,21 +197,26 @@ body {
     transition: background-color 0.2s;
 }
 
-@media screen and (max-width: 1250px) and (min-width: 451px) {
+@media (max-width: 1250px) and (min-width: 701px) {
     .knight {
         display: none;
     }
-    
-    #rules {
-        font-size: 1.5em;
-    }
+}
 
-    #play-button, #newgame-button {
-        font-size: 2em;
+@media (max-width: 700px) and (min-width: 451px) {
+    :root {
+        font-size: 10px;
+    }
+    .knight {
+        display: none;
     }
 }
 
-@media screen and (max-width: 450px) {
+@media (max-width: 450px) {
+    :root {
+        font-size: 9px;
+    }
+    
     #white-knight {
         left: 50%;
         bottom: 3%;
@@ -223,17 +229,5 @@ body {
         top: 3%;
         right: auto;
         bottom: auto;
-    }
-    
-    #inner-border {
-        border-width: 5px;
-    }
-    
-    #rules {
-        font-size: 0.7em;
-    }
-    
-    #play-button, #newgame-button {
-        font-size: 1.5em;
     }
 }
