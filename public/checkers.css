@@ -7,13 +7,22 @@ body {
     user-select: none;
 }
 
-/* This should have fixed the issue where pictures are not centered by JS since they have not loaded yet (and therefore might have 0 width), but it does not work, instead i've added a window timeout function.
- * I've left this here anyway so the pawns could load up immidiately.
- */
+/* Preload so that the pawns could show up immidiately and the knights won't have 0 width */
 body::before {
     display: none;
     content: url(images/knight.png) url(images/white-pawn.png) url(images/black-pawn.png) url(images/white-king.png) url(images/black-king.png);
 } 
+
+#loading {
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 2;
+    background-color: white;
+    transition: opacity 1s;
+}
 
 #background {
     width: 100%;
@@ -214,7 +223,7 @@ body::before {
 
 @media (max-width: 450px) {
     :root {
-        font-size: 9px;
+        font-size: 7.5px;
     }
     
     #white-knight {
@@ -230,4 +239,9 @@ body::before {
         right: auto;
         bottom: auto;
     }
+    
+    #rules ul li::before {
+    margin-left: -2rem;
+    margin-right: 1rem;
+}
 }

@@ -1,4 +1,5 @@
-let tiles = [ // defines the entire tiles array which includes all of the black tiles on the board
+let loadingScreen = document.querySelector("#loading"),
+    tiles = [ // defines the entire tiles array which includes all of the black tiles on the board
         undefined,
         document.querySelectorAll(".first"),
         document.querySelectorAll(".second"),
@@ -31,8 +32,9 @@ playButton.addEventListener("click", () => {
 });
 newGameButton.addEventListener("click", () => { newGameButton.style.display = "none"; coverScreen.style.backgroundColor = "rgba(255, 255, 255, 0)"; gameStart(); });
 
-positionElements();
-window.setTimeout(positionElements, 50); // fixes what 'body::before' fails to do
+window.addEventListener("load", () => { positionElements(); loadingScreen.style.opacity = "0"; });
+window.setTimeout(positionElements, 100); // mobile browsers seem to not position the knights correctly without this
+loadingScreen.addEventListener("transitionend", () => loadingScreen.style.display = "none");
 
 /* Calls resizeComputed for each element */
 function positionElements() {
