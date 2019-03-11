@@ -91,7 +91,7 @@ body::before {
     background-repeat: no-repeat;
 }
 
-#cover-screen {
+#cover {
     z-index: 1;
     width: 95%;
     max-width: 800px;
@@ -124,10 +124,12 @@ body::before {
     font-size: 1.6rem;
 }
 
+/* Diamonds */
 #rules ul li::before {
     content: "\2666";
     display: inline-block;
     width: 1.2rem;
+    color: black;
     /*margin-left: -1rem;*/
 }
 

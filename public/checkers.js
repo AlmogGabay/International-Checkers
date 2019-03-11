@@ -1,4 +1,4 @@
-let loadingScreen = document.querySelector("#loading"),
+let loading = document.querySelector("#loading"),
     tiles = [ // defines the entire tiles array which includes all of the black tiles on the board
         undefined,
         document.querySelectorAll(".first"),
@@ -12,7 +12,7 @@ let loadingScreen = document.querySelector("#loading"),
     ],
     knights = document.querySelectorAll(".knight"),
     board = document.querySelector("#board"),
-    coverScreen = document.querySelector("#cover-screen"),
+    cover = document.querySelector("#cover"),
     rules = document.querySelector("#rules"),
     playButton = document.querySelector("#play-button"),
     newGameButton = document.querySelector("#newgame-button"),
@@ -27,18 +27,18 @@ let loadingScreen = document.querySelector("#loading"),
 
 window.addEventListener("resize", positionElements); // makes the board responsive to window resize
 playButton.addEventListener("click", () => { 
-    coverScreen.addEventListener("transitionend", () => coverScreen.style.display = "none"); // prevents the 'no coverscreen on first launch' issue
-    playButton.style.display = "none"; rules.style.display = "none"; coverScreen.style.backgroundColor = "rgba(255, 255, 255, 0)"; gameStart(); 
+    cover.addEventListener("transitionend", () => cover.style.display = "none"); // prevents the 'no cover on first launch' issue
+    playButton.style.display = "none"; rules.style.display = "none"; cover.style.backgroundColor = "rgba(255, 255, 255, 0)"; gameStart(); 
 });
-newGameButton.addEventListener("click", () => { newGameButton.style.display = "none"; coverScreen.style.backgroundColor = "rgba(255, 255, 255, 0)"; gameStart(); });
+newGameButton.addEventListener("click", () => { newGameButton.style.display = "none"; cover.style.backgroundColor = "rgba(255, 255, 255, 0)"; gameStart(); });
 
-window.addEventListener("load", () => { positionElements(); loadingScreen.style.opacity = "0"; });
+window.addEventListener("load", () => { positionElements(); loading.style.opacity = "0"; });
 window.setTimeout(positionElements, 100); // mobile browsers seem to not position the knights correctly without this
-loadingScreen.addEventListener("transitionend", () => loadingScreen.style.display = "none");
+loading.addEventListener("transitionend", () => loading.style.display = "none");
 
 /* Calls resizeComputed for each element */
 function positionElements() {
-    [knights[0], knights[1], board, coverScreen, playButton, newGameButton].forEach(e => resizeComputed(e));
+    [knights[0], knights[1], board, cover, playButton, newGameButton].forEach(e => resizeComputed(e));
 }
 
 /* Makes the element dynamically adapt to the window size */
@@ -53,17 +53,14 @@ function resizeComputed(element) {
         }
     }
     else { // if not a knight
-        if (element == board || element == coverScreen) element.style.height = window.getComputedStyle(element).width;
+        if (element == board || element == cover) element.style.height = window.getComputedStyle(element).width;
         element.style.marginTop = `${window.getComputedStyle(element).height.slice(0, -2) / -2}px`;
         element.style.marginLeft = `${window.getComputedStyle(element).width.slice(0, -2) / -2}px`;
     }
 }
 
 function gameStart() {
-    turn = "whitePawn";
-    whitePawns = 12;
-    blackPawns = 12;
-    lastSelected = undefined;
+    [turn, whitePawns, blackPawns, lastSelected] = ["whitePawn", 12, 12, null];
     knights[0].style.opacity = "1";
     knights[1].style.opacity = "0.3";
     for (let row = 1; row < tiles.length; row++) {
@@ -250,10 +247,10 @@ function executeCapture(captured) {
 
 function checkGameOver() {
     if (whitePawns == 0 || blackPawns == 0) {
-        coverScreen.style.display = "block";
-        coverScreen.style.backgroundColor = "rgba(255, 255, 255, 0.4)";
+        cover.style.display = "block";
+        cover.style.backgroundColor = "rgba(255, 255, 255, 0.4)";
         newGameButton.style.display = "inline-block";
-        resizeComputed(coverScreen);
+        resizeComputed(cover);
         resizeComputed(newGameButton);
         return true;
     }
