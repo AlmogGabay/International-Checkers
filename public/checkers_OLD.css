@@ -1,0 +1,249 @@
+:root {
+    font-size: 16px;
+}
+
+body {
+    margin: 0;
+    user-select: none;
+}
+
+/* Preload so that the pawns could show up immidiately and the knights won't have 0 width */
+body::before {
+    display: none;
+    content: url(images/knight.png) url(images/white-pawn.png) url(images/black-pawn.png) url(images/white-king.png) url(images/black-king.png);
+} 
+
+#loading {
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 2;
+    background-color: white;
+    transition: opacity 1s;
+}
+
+#background {
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: -1;
+    background-image: url(images/background.jpg);
+    opacity: 0.2;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-attachment: fixed;
+}
+
+.knight {
+    width: 10%;
+    max-width: 300px;
+    transition: opacity 0.5s;
+    -webkit-box-reflect: below 0px -webkit-gradient(linear, left top, left bottom, from(transparent), color-stop(30%, transparent) , to(rgba(250, 250, 250, 0.2)));
+}
+
+#white-knight {
+    position: absolute;
+    top: 50%;
+    left: 5%;
+    transform: rotateY(180deg);
+}
+
+#black-knight {
+    position: absolute;
+    top: 50%;
+    right: 5%;
+    filter: invert(100%);
+}
+
+#board {
+    width: 95%;
+    max-width: 800px;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    background-color: rgb(40, 40, 40);
+    box-shadow: 0 0.25rem 0.5rem 0 rgba(0, 0, 0, 0.2), 0 0.25rem 0.5rem 0 rgba(0, 0, 0, 0.2);
+}
+
+#inner-border {
+    width: 90%;
+    height: 90%;
+    position: absolute;
+    top: 5%;
+    left: 5%;
+    background-color: rgb(255, 245, 198);
+    border: 0.75rem solid rgb(80, 80, 80);
+    box-sizing: border-box;
+}
+
+/* Tiles */
+#inner-border div {
+    width: 12.5%;
+    height: 12.5%;
+    float: left;
+    background-size: 95%;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+#cover {
+    z-index: 1;
+    width: 95%;
+    max-width: 800px;
+    position: absolute;
+    padding: 0;
+    box-sizing: border-box;
+    left: 50%;
+    top: 50%;
+    background-color: rgba(255, 255, 255, 0.6);
+    transition: background-color 0.5s;
+}
+
+#rules {
+    position: absolute;
+    top: 3%;
+    display: inline-block;
+    padding: 0 10%;
+    font-family: 'Cinzel', serif;
+    font-size: 1.8rem;
+}
+
+#rules h1 {
+    text-align: center;
+    letter-spacing: 1rem;
+    padding-left: 1rem;
+}
+
+#rules ul {
+    list-style: none;
+    font-size: 1.6rem;
+}
+
+/* Diamonds */
+#rules ul li::before {
+    content: "\2666";
+    display: inline-block;
+    width: 1.2rem;
+    color: black;
+    /*margin-left: -1rem;*/
+}
+
+#rules a {
+    font-weight: bold;
+    text-decoration: none;
+}
+
+#play-button, #newgame-button {
+    position: absolute;
+    left: 50%;
+    bottom: 18%;
+    padding: 0.5rem;
+    box-sizing: border-box;
+    border: 0.1rem solid rgba(255, 255 ,255, 0.5);
+    border-radius: 0.5rem;
+    font-size: 3rem;
+    color: white;
+    background-color: rgba(255, 255, 255, 0.5);
+    -webkit-text-stroke: 0.05rem gray;
+    text-shadow: 0.125rem 0.125rem 0 black;
+}
+
+#newgame-button {
+    display: none;
+    bottom: auto;
+    top: 50%;
+}
+
+#play-button:hover, #newgame-button:hover {
+    background-color: rgba(0, 0, 0, 0.4);
+}
+
+.white-tile {
+    background-color: white;
+}
+
+.black-tile {
+    background-color: gray;
+}
+
+.pressed-pawn {
+    box-shadow: 0.05rem 0.05rem 0.25rem 0.025rem inset;
+}
+
+.white-pawn {
+    background-image: url(images/white-pawn.png);
+}
+
+.black-pawn {
+    background-image: url(images/black-pawn.png);
+}
+
+.white-king {
+    background-image: url(images/white-king.png);
+}
+
+.black-king {
+    background-image: url(images/black-king.png);
+}
+
+.suggested-move {
+    background-color: steelblue;
+    opacity: 0.8;
+    transition: background-color 0.2s;
+}
+
+.intermediate-capture {
+    box-shadow: 0.05rem 0.05rem 0.2rem 0.2rem inset;
+    transition: box-shadow 0.2s;
+}
+
+.capture {
+    background-color: red;
+    opacity: 0.8;
+    transition: background-color 0.2s;
+}
+
+@media (max-width: 1250px) and (min-width: 701px) {
+    .knight {
+        display: none;
+    }
+}
+
+@media (max-width: 700px) and (min-width: 451px) {
+    :root {
+        font-size: 10px;
+    }
+    .knight {
+        display: none;
+    }
+}
+
+@media (max-width: 450px) {
+    :root {
+        font-size: 7.5px;
+    }
+    
+    #white-knight {
+        left: 50%;
+        bottom: 3%;
+        top: auto;
+        right: auto;
+    }
+    
+    #black-knight {
+        left: 50%;
+        top: 3%;
+        right: auto;
+        bottom: auto;
+    }
+    
+    #rules ul li::before {
+    margin-left: -2rem;
+    margin-right: 1rem;
+}
+}

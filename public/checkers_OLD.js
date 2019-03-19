@@ -1,15 +1,22 @@
-let root = qS(":root"),
-    loading = qS("#loading"),
-    tiles = [null, qS(".first", true), qS(".second", true), qS(".third", true), qS(".fourth", true), 
-                   qS(".fifth", true), qS(".sixth", true), qS(".seventh", true), qS(".eighth", true)],
-    knights = qS(".knight", true),
-    board = qS("#board"),
-    coverContainer = qS("#cover-flex-container"),
-    cover = qS("#cover"),
-    rules = qS("#rules"),
-    playButton = qS("#play-button"),
-    newGameButton = qS("#newgame-button"),
-    turn,
+let loading = document.querySelector("#loading"),
+    tiles = [ // defines the entire tiles array which includes all of the black tiles on the board
+        undefined,
+        document.querySelectorAll(".first"),
+        document.querySelectorAll(".second"),
+        document.querySelectorAll(".third"),
+        document.querySelectorAll(".fourth"),
+        document.querySelectorAll(".fifth"),
+        document.querySelectorAll(".sixth"),
+        document.querySelectorAll(".seventh"),
+        document.querySelectorAll(".eighth")
+    ],
+    knights = document.querySelectorAll(".knight"),
+    board = document.querySelector("#board"),
+    cover = document.querySelector("#cover"),
+    rules = document.querySelector("#rules"),
+    playButton = document.querySelector("#play-button"),
+    newGameButton = document.querySelector("#newgame-button"),
+    turn, 
     whitePawns,
     blackPawns,
     lastSelected,
@@ -18,61 +25,37 @@ let root = qS(":root"),
         black: tile => { tile.classList.add("black-pawn"); tile.blackPawn = true; }
     };
 
-window.addEventListener("DOMContentLoaded", () => { 
-    getWidth(); 
-    setTimeout(() => loading.style.opacity = "0", 500);
-    loading.addEventListener("transitionend", () => loading.style.display = "none");
-});
-window.addEventListener("resize", () => getWidth());
+window.addEventListener("resize", positionElements); // makes the board responsive to window resize
 playButton.addEventListener("click", () => { 
-    cover.addEventListener("transitionend", () => coverContainer.style.display = "none"); // prevents the 'no cover on first launch' issue
-    playButton.style.display = rules.style.display = "none"; 
-    cover.style.backgroundColor = "rgba(255, 255, 255, 0)"; 
-    gameStart(); 
+    cover.addEventListener("transitionend", () => cover.style.display = "none"); // prevents the 'no cover on first launch' issue
+    playButton.style.display = "none"; rules.style.display = "none"; cover.style.backgroundColor = "rgba(255, 255, 255, 0)"; gameStart(); 
 });
 newGameButton.addEventListener("click", () => { newGameButton.style.display = "none"; cover.style.backgroundColor = "rgba(255, 255, 255, 0)"; gameStart(); });
 
-/* Shortens querySelector */
-function qS(sel, all) {
-    return all ? document.querySelectorAll(sel) : document.querySelector(sel);
+window.addEventListener("load", () => { positionElements(); loading.style.opacity = "0"; });
+window.setTimeout(positionElements, 100); // mobile browsers seem to not position the knights correctly without this
+loading.addEventListener("transitionend", () => loading.style.display = "none");
+
+/* Calls resizeComputed for each element */
+function positionElements() {
+    [knights[0], knights[1], board, cover, playButton, newGameButton].forEach(e => resizeComputed(e));
 }
 
-function getWidth() {
-    if (window.visualViewport) {
-        if (window.visualViewport.width >= 1200) {
-            resize(0.45, 0.1, true);
-        } else if (window.visualViewport.width <= 576) {
-            resize(0.95, 0.1, true);
-        } else {
-            resize((-1/1248) * window.visualViewport.width + (367/260), 0.1, true); // f(x) = (-1/1248)x + (367/260)
-        }
-    } 
-    else {
-        if (window.innerWidth >= 1200) {
-            resize(0.45);
-        } else if (window.innerWidth <= 576) {
-            resize(0.95);
-        } else {
-            resize((-1/1248) * window.innerWidth + (367/260)); // f(x) = (-1/1248)x + (367/260)
+/* Makes the element dynamically adapt to the window size */
+function resizeComputed(element) {
+    if (element == knights[0] || element == knights[1]) { // if a knight
+        if (window.innerWidth <= 450) {
+            element.style.marginTop = "auto";
+            element.style.marginLeft = `${window.getComputedStyle(element).width.slice(0, -2) / -2}px`;
+        } 
+        else {
+            element.style.marginTop = `${window.getComputedStyle(element).height.slice(0 ,-2) / -2}px`;
         }
     }
-}
-
-function resize(bM, kM = 0.1, vV) { // boardMuliplier, knightMultiplier, visualViewport
-    let boardWidth, knightWidth;
-    if (vV) {
-        boardWidth = window.visualViewport.width * bM + "px",
-        knightWidth = window.visualViewport.width * kM + "px";    
-    }
-    else {
-        boardWidth = window.innerWidth * bM + "px",
-        knightWidth = window.innerWidth * kM + "px";
-    }
-    board.style.width = board.style.height = cover.style.width = cover.style.height = boardWidth;
-    knights[0].style.width = knights[1].style.width = knightWidth;
-    root.style.fontSize = `${boardWidth.slice(0, -2) / 50}px`;
-    if (window.getComputedStyle(board).width != window.getComputedStyle(board).height) {
-        resize(bM, kM / 2, vV);
+    else { // if not a knight
+        if (element == board || element == cover) element.style.height = window.getComputedStyle(element).width;
+        element.style.marginTop = `${window.getComputedStyle(element).height.slice(0, -2) / -2}px`;
+        element.style.marginLeft = `${window.getComputedStyle(element).width.slice(0, -2) / -2}px`;
     }
 }
 
@@ -80,32 +63,28 @@ function gameStart() {
     [turn, whitePawns, blackPawns, lastSelected] = ["whitePawn", 12, 12, null];
     knights[0].style.opacity = "1";
     knights[1].style.opacity = "0.3";
-    tiles.forEach(row => !row || clearTiles(row)); // tiles[0] is null
+    for (let row = 1; row < tiles.length; row++) {
+        clearTiles(tiles[row]);
+    }
     fillPawns();
 }
 
 /* Places all the pawns in their initial position */
 function fillPawns() {
-    tiles.forEach((row, rowIndex) => {
-        if (rowIndex >= 1 && rowIndex <= 3) {
-            row.forEach(setPawns.white);
-        } else if (rowIndex >= 6 && rowIndex <= 8) {
-            row.forEach(setPawns.black);
-        }
-    });
-    tiles.forEach((row, rowIndex) =>
-        !row || row.forEach((tile, tileIndex) =>
-            tile.addEventListener("click", () => checkMovement(tile, rowIndex, tileIndex))
-        )
-    );
+    tiles[1].forEach(setPawns.white);
+    tiles[2].forEach(setPawns.white);
+    tiles[3].forEach(setPawns.white);
+    tiles[6].forEach(setPawns.black);
+    tiles[7].forEach(setPawns.black);
+    tiles[8].forEach(setPawns.black);
+    for (let row = 1; row < tiles.length; row++) {
+        tiles[row].forEach((t, i) => t.addEventListener("click", () => checkMovement(t, row, i)));
+    }
 }
 
 /* Clears all previous pawns */
-function clearTiles(tilesRow) {
-    tilesRow.forEach(tile => { 
-        tile.classList.remove("white-pawn", "black-pawn", "white-king", "black-king"); 
-        delete tile.whitePawn; delete tile.blackPawn; delete tile.king; 
-    });
+function clearTiles(tiles) {
+    tiles.forEach(t => { t.classList.remove("white-pawn", "black-pawn", "white-king", "black-king"); delete t.whitePawn; delete t.blackPawn; delete t.king; });
 }
 
 function checkMovement(selectedTile, row, tile) {
@@ -179,22 +158,19 @@ function showSuggestions(selectedTile, row, tile) {
         stepTiles.forEach(t => t.classList.remove("suggested-move")); // removes all step tiles, since capture is mandatory for a specific pawn
         captureTiles // leaves only the max length captures
         .sort((a, b) => b.captured.length - a.captured.length) // sorts by capture magnitude
-        .filter(tile => tile.captured.length == captureTiles[0].captured.length) // leaves only the longest capture paths
-        .forEach(tile => { tile.classList.remove("intermediate-capture"); tile.classList.add("suggested-move"); });
+        .filter(t => t.captured.length == captureTiles[0].captured.length) // leaves only the longest capture paths
+        .forEach(t => { t.classList.remove("intermediate-capture"); t.classList.add("suggested-move"); });
     }
 }
 
 function clearSuggestions() {
-    tiles.forEach(row => 
-        !row || row.forEach(tile => {
-            tile.classList.remove("suggested-move", "intermediate-capture", "capture");
-            delete tile.captured;
-        })
-    );
+    for (let row = 1; row < tiles.length; row++) {
+        tiles[row].forEach(t => { t.classList.remove("suggested-move", "intermediate-capture", "capture"); delete t.captured; });
+    }
 }
 
 /* The backtracking recursion which calculates all the possible movements */
-function backtrackMovements(r, t, rStep, tStep, doubleTileStep, friend, foe, originalPawn, captureOccured = false, capturedArr = []) { // row, tile, rowStep, tileStep
+function backtrackMovements(r, t, rStep, tStep, doubleTileStep, friend, foe, originalPawn, captureOccured = false, capturedArr = []) {
     /* FORWARD MOVEMENT */
     if (tiles[r+rStep] && tiles[r+rStep][t+tStep] && !tiles[r+rStep][t+tStep][friend]) { // if not friend
         if (!tiles[r+rStep][t+tStep][foe]) { // if empty and the pressed pawn is not a king
@@ -203,7 +179,7 @@ function backtrackMovements(r, t, rStep, tStep, doubleTileStep, friend, foe, ori
         else if (tiles[r+rStep*2] && tiles[r+rStep*2][t+doubleTileStep] && !tiles[r+rStep*2][t+doubleTileStep].captured) { // if jump tile exists AND has no captured
             if (!tiles[r+rStep*2][t+doubleTileStep][friend] && !tiles[r+rStep*2][t+doubleTileStep][foe] || tiles[r+rStep*2][t+doubleTileStep] == originalPawn && capturedArr.length >= 3) { // if jump tile is empty OR if jump tile equals the pressed tile AND at least 3 captures have been marked
                 capturedArr.push(tiles[r+rStep][t+tStep]);
-                markTiles(r+rStep*2, t+doubleTileStep, r+rStep, t+tStep, capturedArr.slice());
+                markTiles(r, t, r+rStep*2, t+doubleTileStep, r+rStep, t+tStep, capturedArr.slice());
                 backtrackMovements(r+rStep*2, t+doubleTileStep, rStep, tStep, doubleTileStep, friend, foe, originalPawn, true, capturedArr.slice());
                 capturedArr.pop();
             }
@@ -217,7 +193,7 @@ function backtrackMovements(r, t, rStep, tStep, doubleTileStep, friend, foe, ori
         else if (tiles[r+rStep*2] && tiles[r+rStep*2][t-doubleTileStep] && !tiles[r+rStep*2][t-doubleTileStep].captured) {
             if (!tiles[r+rStep*2][t-doubleTileStep][friend] && !tiles[r+rStep*2][t-doubleTileStep][foe] || tiles[r+rStep*2][t-doubleTileStep] == originalPawn && capturedArr.length >= 3) {
                 capturedArr.push(tiles[r+rStep][t]);
-                markTiles(r+rStep*2, t-doubleTileStep, r+rStep, t, capturedArr.slice());
+                markTiles(r, t, r+rStep*2, t-doubleTileStep, r+rStep, t, capturedArr.slice());
                 backtrackMovements(r+rStep*2, t-doubleTileStep, rStep, tStep, doubleTileStep, friend, foe, originalPawn, true, capturedArr.slice());
                 capturedArr.pop();
             }
@@ -230,7 +206,7 @@ function backtrackMovements(r, t, rStep, tStep, doubleTileStep, friend, foe, ori
             if (tiles[r-rStep*2] && tiles[r-rStep*2][t+doubleTileStep] && !tiles[r-rStep*2][t+doubleTileStep].captured) { 
                 if (!tiles[r-rStep*2][t+doubleTileStep][friend] && !tiles[r-rStep*2][t+doubleTileStep][foe] || tiles[r-rStep*2][t+doubleTileStep] == originalPawn && capturedArr.length >= 3) {
                     capturedArr.push(tiles[r-rStep][t+tStep]);
-                    markTiles(r-rStep*2, t+doubleTileStep, r-rStep, t+tStep, capturedArr.slice());
+                    markTiles(r, t, r-rStep*2, t+doubleTileStep, r-rStep, t+tStep, capturedArr.slice());
                     backtrackMovements(r-rStep*2, t+doubleTileStep, rStep, tStep, doubleTileStep, friend, foe, originalPawn, true, capturedArr.slice());
                     capturedArr.pop();
                 }
@@ -246,7 +222,7 @@ function backtrackMovements(r, t, rStep, tStep, doubleTileStep, friend, foe, ori
             if (tiles[r-rStep*2] && tiles[r-rStep*2][t-doubleTileStep] && !tiles[r-rStep*2][t-doubleTileStep].captured) {
                 if (!tiles[r-rStep*2][t-doubleTileStep][friend] && !tiles[r-rStep*2][t-doubleTileStep][foe] || tiles[r-rStep*2][t-doubleTileStep] == originalPawn && capturedArr.length >= 3) {
                     capturedArr.push(tiles[r-rStep][t]);
-                    markTiles(r-rStep*2, t-doubleTileStep, r-rStep, t, capturedArr.slice());
+                    markTiles(r, t, r-rStep*2, t-doubleTileStep, r-rStep, t, capturedArr.slice());
                     backtrackMovements(r-rStep*2, t-doubleTileStep, rStep, tStep, doubleTileStep, friend, foe, originalPawn, true, capturedArr.slice());
                 }
             }
@@ -258,22 +234,24 @@ function backtrackMovements(r, t, rStep, tStep, doubleTileStep, friend, foe, ori
 }
 
 /* Colors the possible paths */
-function markTiles(rowJump, tileJump, rowCap, tileCap, capturedArr) { // Cap means 'capture'
-    tiles[rowJump][tileJump].captured = capturedArr;
-    tiles[rowJump][tileJump].classList.add("intermediate-capture");
-    tiles[rowCap][tileCap].classList.add("capture");
+function markTiles(r, t, rJump, tJump, rCap, tCap, capturedArr) { // Cap means 'capture'
+    tiles[rJump][tJump].captured = capturedArr;
+    tiles[rJump][tJump].classList.add("intermediate-capture");
+    tiles[rCap][tCap].classList.add("capture");
 }
 
 function executeCapture(captured) {
-    turn == "whitePawn" ? blackPawns -= captured.length : whitePawns -= captured.length;
     clearTiles(captured);
+    turn == "whitePawn" ? blackPawns -= captured.length : whitePawns -= captured.length;
 }
 
 function checkGameOver() {
     if (whitePawns == 0 || blackPawns == 0) {
-        coverContainer.style.display = "flex";
+        cover.style.display = "block";
         cover.style.backgroundColor = "rgba(255, 255, 255, 0.4)";
         newGameButton.style.display = "inline-block";
+        resizeComputed(cover);
+        resizeComputed(newGameButton);
         return true;
     }
     return false;
