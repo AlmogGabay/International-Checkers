@@ -61,7 +61,7 @@ body::before {
 #board {
     display: flex;
     background-color: rgb(40, 40, 40);
-    box-shadow: 0 0.25rem 0.5rem 0 rgba(0, 0, 0, 0.2), 0 0.25rem 0.5rem 0 rgba(0, 0, 0, 0.2);
+    box-shadow: 0 0 0.2rem 0.05rem rgba(0, 0, 0, 0.5);
 }
 
 #inner-border {
@@ -183,7 +183,7 @@ body::before {
 }
 
 .suggested-move {
-    background-color: steelblue;
+    background-color: dodgerblue;
     transition: background-color 0.5s;
 }
 
@@ -218,6 +218,10 @@ body::before {
 @media (max-width: 576px) {
     #flex-container {
         flex-direction: column;
+    }
+    
+    #black-knight {
+        transform: rotateX(180deg);
     }
     
     #rules ul li::before {
