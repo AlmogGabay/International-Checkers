@@ -203,6 +203,10 @@ body::before {
     }
     
     #black-knight {
+        transform: rotateX(180deg);
+    }
+    
+    #black-knight {
         order: 1;
     }
     
@@ -212,20 +216,5 @@ body::before {
     
     #white-knight {
         order: 3;
-    }
-}
-
-@media (max-width: 576px) {
-    #flex-container {
-        flex-direction: column;
-    }
-    
-    #black-knight {
-        transform: rotateX(180deg);
-    }
-    
-    #rules ul li::before {
-        margin-left: -1rem;
-        margin-right: 1.5rem;
     }
 }
