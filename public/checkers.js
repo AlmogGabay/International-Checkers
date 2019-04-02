@@ -14,7 +14,7 @@ let root = qS(":root"),
     blackPawns,
     lastSelected,
     setPawns = {
-        white: tile => { tile.classList.add("white-pawn"); tile.whitePawn = true; },
+        white: tile => { tile.classList.add("white-pawn"); tile.whitePawn = true; tile.style.cursor = "pointer"; },
         black: tile => { tile.classList.add("black-pawn"); tile.blackPawn = true; }
     };
 
@@ -77,7 +77,7 @@ function resize(bM, kM = 0.1, vV) { // boardMuliplier, knightMultiplier, visualV
 }
 
 function gameStart() {
-    [turn, whitePawns, blackPawns, lastSelected] = ["blackPawn", 12, 12, null]; // turn will be changed to white in fillPawns
+    [turn, whitePawns, blackPawns, lastSelected] = ["whitePawn", 12, 12, null];
     knights[0].style.opacity = "1";
     knights[1].style.opacity = "0.3";
     tiles.forEach(row => !row || clearTiles(row)); // tiles[0] is null
@@ -99,7 +99,6 @@ function fillPawns() {
             tile.addEventListener("click", () => checkMovement(tile, rowIndex, tileIndex))
         )
     );
-    switchTurns(); // We call it here to make sure that all the cursors will be correct when pressing "Play Again"
 }
 
 /* Clears all previous pawns */
