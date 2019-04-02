@@ -33,8 +33,8 @@ playButton.addEventListener("click", () => {
 newGameButton.addEventListener("click", () => { newGameButton.style.display = "none"; cover.style.backgroundColor = "rgba(255, 255, 255, 0)"; gameStart(); });
 
 /* Shortens querySelector */
-function qS(sel, all) {
-    return all ? document.querySelectorAll(sel) : document.querySelector(sel);
+function qS(selector, all) {
+    return all ? document.querySelectorAll(selector) : document.querySelector(selector);
 }
 
 function getWidth() {
@@ -77,10 +77,11 @@ function resize(bM, kM = 0.1, vV) { // boardMuliplier, knightMultiplier, visualV
 }
 
 function gameStart() {
-    [turn, whitePawns, blackPawns, lastSelected] = ["whitePawn", 12, 12, null];
+    [turn, whitePawns, blackPawns, lastSelected] = ["blackPawn", 12, 12, null]; // turn will be changed to white in fillPawns
     knights[0].style.opacity = "1";
     knights[1].style.opacity = "0.3";
     tiles.forEach(row => !row || clearTiles(row)); // tiles[0] is null
+    tiles.forEach(row => !row || row.forEach(tile => tile.style.cursor = "default")); // removes all cursors
     fillPawns();
 }
 
@@ -98,6 +99,7 @@ function fillPawns() {
             tile.addEventListener("click", () => checkMovement(tile, rowIndex, tileIndex))
         )
     );
+    switchTurns(); // We call it here to make sure that all the cursors will be correct when pressing "Play Again"
 }
 
 /* Clears all previous pawns */
@@ -142,26 +144,19 @@ function checkMovement(selectedTile, row, tile) {
             selectedTile.blackPawn = true;
         }
         if (!checkGameOver()) {
-            /* Switch turns */
-            if (turn == "whitePawn") {
-                turn = "blackPawn";
-                knights[0].style.opacity = "0.3";
-                knights[1].style.opacity = "1";
-            }
-            else {
-                turn = "whitePawn";
-                knights[0].style.opacity = "1";
-                knights[1].style.opacity = "0.3";
-            }
+            switchTurns();
         }
     }
     clearSuggestions();
-    if (lastSelected) { 
-        lastSelected.classList.remove("pressed-pawn");
-    }
-    if (selectedTile[turn] && !checkGameOver()) { // if a tile with the  urrent turn pawn on it is selected (checkGameOver prevents the issue when the final move is clicked twice and shows suggestions even after the game is over)
+    if (selectedTile[turn] && !checkGameOver()) { // if a current turn pawn is selected (checkGameOver prevents the issue when the final move is clicked twice and shows suggestions even after the game is over)
         selectedTile.classList.add("pressed-pawn");
         showSuggestions(selectedTile, row, tile);
+    }
+    if (lastSelected && lastSelected != selectedTile) { 
+        lastSelected.classList.remove("pressed-pawn");
+        if (!lastSelected[turn]) {
+            lastSelected.style.cursor = "default";   
+        }
     }
     lastSelected = selectedTile; // "remembers" the last tile that was selected, this allows a capturer to move to its new position
 }
@@ -267,6 +262,23 @@ function markTiles(rowJump, tileJump, rowCap, tileCap, capturedArr) { // Cap mea
 function executeCapture(captured) {
     turn == "whitePawn" ? blackPawns -= captured.length : whitePawns -= captured.length;
     clearTiles(captured);
+}
+
+function switchTurns() {
+    if (turn == "whitePawn") {
+        turn = "blackPawn";
+        knights[0].style.opacity = "0.3";
+        knights[1].style.opacity = "1";
+        qS(".white-pawn, .white-king", true).forEach(pawn => pawn.style.cursor = "default");
+        qS(".black-pawn, .black-king", true).forEach(pawn => pawn.style.cursor = "pointer");
+    }
+    else {
+        turn = "whitePawn";
+        knights[0].style.opacity = "1";
+        knights[1].style.opacity = "0.3";
+        qS(".black-pawn, .black-king", true).forEach(pawn => pawn.style.cursor = "default");
+        qS(".white-pawn, .white-king", true).forEach(pawn => pawn.style.cursor = "pointer");
+    }
 }
 
 function checkGameOver() {
