@@ -167,7 +167,7 @@ function showSuggestions(selectedTile, row, tile) {
     else { // black turn
         (row%2 == 0) ? backtrackMovements(row, tile, -1, 1, 1, "blackPawn", "whitePawn", selectedTile) : backtrackMovements(row, tile, -1, -1, -1, "blackPawn", "whitePawn", selectedTile);   
     }
-    let [stepTiles, captureTiles] = [[...document.querySelectorAll(".suggested-move")], [...document.querySelectorAll(".intermediate-capture")]];
+    let [stepTiles, captureTiles] = [[...qS(".suggested-move", true)], [...qS(".intermediate-capture", true)]];
     if (captureTiles.length) { // if there are captures
         stepTiles.forEach(tile => tile.classList.remove("suggested-move")); // removes all step tiles, since capture is mandatory for a specific pawn
         captureTiles // leaves only the max length captures
