@@ -167,10 +167,9 @@ function showSuggestions(selectedTile, row, tile) {
     else { // black turn
         (row%2 == 0) ? backtrackMovements(row, tile, -1, 1, 1, "blackPawn", "whitePawn", selectedTile) : backtrackMovements(row, tile, -1, -1, -1, "blackPawn", "whitePawn", selectedTile);   
     }
-    let stepTiles = Array.prototype.slice.call(document.querySelectorAll(".suggested-move")),
-        captureTiles = Array.prototype.slice.call(document.querySelectorAll(".intermediate-capture"));
-    if (captureTiles.length > 0) { // if there are captures
-        stepTiles.forEach(t => t.classList.remove("suggested-move")); // removes all step tiles, since capture is mandatory for a specific pawn
+    let [stepTiles, captureTiles] = [[...document.querySelectorAll(".suggested-move")], [...document.querySelectorAll(".intermediate-capture")]];
+    if (captureTiles.length) { // if there are captures
+        stepTiles.forEach(tile => tile.classList.remove("suggested-move")); // removes all step tiles, since capture is mandatory for a specific pawn
         captureTiles // leaves only the max length captures
         .sort((a, b) => b.captured.length - a.captured.length) // sorts by capture magnitude
         .filter(tile => tile.captured.length == captureTiles[0].captured.length) // leaves only the longest capture paths
@@ -217,7 +216,6 @@ function backtrackMovements(r, t, rStep, tStep, doubleTileStep, friend, foe, ori
             }
         }
     }
-    
     /* BACKWARD MOVEMENT */
     if (tiles[r-rStep] && tiles[r-rStep][t+tStep] && !tiles[r-rStep][t+tStep][friend]) { 
         if (tiles[r-rStep][t+tStep][foe]) {
