@@ -65,18 +65,18 @@ body::before {
 }
 
 #inner-border {
+    display: grid;
     width: 90%;
     height: 90%;
     margin: auto;
     border: 0.75rem solid rgb(80, 80, 80);
     box-sizing: border-box;
+    grid-template-rows: repeat(8, 1fr);
+    grid-template-columns: repeat(8, 1fr);
 }
 
 /* Tiles */
 #inner-border div {
-    width: 12.5%;
-    height: 12.5%;
-    float: left;
     background-size: 95%;
     background-position: center;
     background-repeat: no-repeat;
