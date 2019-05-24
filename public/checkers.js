@@ -1,43 +1,38 @@
-let root = qS(':root'),
-    loading = qS('#loading'),
-    tiles = [null, qS('.first', true), qS('.second', true), qS('.third', true), qS('.fourth', true), 
-                   qS('.fifth', true), qS('.sixth', true), qS('.seventh', true), qS('.eighth', true)],
-    knights = qS('.knight', true),
-    board = qS('#board'),
-    coverContainer = qS('#cover-flex-container'),
-    cover = qS('#cover'),
-    rules = qS('#rules'),
-    playButton = qS('#play-button'),
-    newGameButton = qS('#newgame-button'),
-    turn,
-    whitePawns,
-    blackPawns,
-    lastSelected,
-    setPawns = {
-        white: tile => { tile.classList.add('white-pawn'); tile.whitePawn = true; tile.style.cursor = 'pointer'; },
-        black: tile => { tile.classList.add('black-pawn'); tile.blackPawn = true; }
-    };
-
-window.addEventListener('DOMContentLoaded', () => { 
-    getWidth(); 
-    setTimeout(() => loading.style.opacity = '0', 500);
-    loading.addEventListener('transitionend', () => loading.style.display = 'none');
-});
-window.addEventListener('resize', () => getWidth());
-playButton.addEventListener('click', () => { 
-    cover.addEventListener('transitionend', () => coverContainer.style.display = 'none'); // prevents the 'no cover on first launch' issue
-    playButton.style.display = rules.style.display = 'none'; 
-    cover.style.backgroundColor = 'rgba(255, 255, 255, 0)'; 
-    gameStart(); 
-});
-newGameButton.addEventListener('click', () => { newGameButton.style.display = 'none'; cover.style.backgroundColor = 'rgba(255, 255, 255, 0)'; gameStart(); });
-
 /* Shortens querySelector */
-function qS(selector, all) {
-    return all ? document.querySelectorAll(selector) : document.querySelector(selector);
-}
+const qS = (selector, all) => all ? document.querySelectorAll(selector) : document.querySelector(selector);
 
-function getWidth() {
+
+  /**********************/
+ /*VARIABLE DEFINITIONS*/
+/**********************/
+
+const root = qS(':root');
+const loading = qS('#loading');
+const tiles = [null, qS('.first', true), qS('.second', true), qS('.third', true), qS('.fourth', true), 
+                qS('.fifth', true), qS('.sixth', true), qS('.seventh', true), qS('.eighth', true)];
+const knights = qS('.knight', true);
+const board = qS('#board');
+const coverContainer = qS('#cover-flex-container');
+const cover = qS('#cover');
+const rules = qS('#rules');
+const playButton = qS('#play-button');
+const newGameButton = qS('#newgame-button');
+const setPawns = {
+    white: tile => { tile.classList.add('white-pawn'); tile.whitePawn = true; tile.style.cursor = 'pointer'; },
+    black: tile => { tile.classList.add('black-pawn'); tile.blackPawn = true; }
+};
+    
+let turn;
+let whitePawns;
+let blackPawns;
+let lastSelected;
+
+
+  /**********************/
+ /*FUNCTION DEFINITIONS*/
+/**********************/
+
+const getWidth = () => {
     if (window.visualViewport) {
         if (window.visualViewport.width >= 1200) {
             resize(0.45, 0.1, true);
@@ -58,7 +53,7 @@ function getWidth() {
     }
 }
 
-function resize(bM, kM = 0.1, vV) { // boardMuliplier, knightMultiplier, visualViewport
+const resize = (bM, kM = 0.1, vV) => { // boardMuliplier, knightMultiplier, visualViewport
     let boardWidth, knightWidth;
     if (vV) {
         boardWidth = window.visualViewport.width * bM + 'px',
@@ -76,7 +71,7 @@ function resize(bM, kM = 0.1, vV) { // boardMuliplier, knightMultiplier, visualV
     }
 }
 
-function gameStart() {
+const gameStart = () => {
     [turn, whitePawns, blackPawns, lastSelected] = ['whitePawn', 12, 12, null];
     knights[0].style.opacity = '1';
     knights[1].style.opacity = '0.3';
@@ -86,7 +81,7 @@ function gameStart() {
 }
 
 /* Places all the pawns in their initial position */
-function fillPawns() {
+const fillPawns = () => {
     tiles.forEach((row, rowIndex) => {
         if (rowIndex >= 1 && rowIndex <= 3) {
             row.forEach(setPawns.white);
@@ -102,14 +97,14 @@ function fillPawns() {
 }
 
 /* Clears all previous pawns */
-function clearTiles(tilesRow) {
+const clearTiles = tilesRow => {
     tilesRow.forEach(tile => { 
         tile.classList.remove('white-pawn', 'black-pawn', 'white-king', 'black-king'); 
         delete tile.whitePawn; delete tile.blackPawn; delete tile.king; 
     });
 }
 
-function checkMovement(selectedTile, row, tile) {
+const checkMovement = (selectedTile, row, tile) => {
     if (selectedTile.classList.contains('suggested-move')) { // if a suggested path is clicked (a pawn can move only to a suggested path)
         if (selectedTile.captured) executeCapture(selectedTile.captured); // if the clicked tile is a suggested capture path
         if (turn == 'whitePawn') { // white turn
@@ -160,7 +155,7 @@ function checkMovement(selectedTile, row, tile) {
     lastSelected = selectedTile; // 'remembers' the last tile that was selected, this allows a capturer to move to its new position
 }
 
-function showSuggestions(selectedTile, row, tile) {
+const showSuggestions = (selectedTile, row, tile) => {
     if (turn == 'whitePawn') { // white turn
         (row%2 == 0) ? backtrackMovements(row, tile, 1, 1, 1, 'whitePawn', 'blackPawn', selectedTile) : backtrackMovements(row, tile, 1, -1, -1, 'whitePawn', 'blackPawn', selectedTile);
     }
@@ -177,7 +172,7 @@ function showSuggestions(selectedTile, row, tile) {
     }
 }
 
-function clearSuggestions() {
+const clearSuggestions = () => {
     tiles.forEach(row => 
         !row || row.forEach(tile => {
             tile.classList.remove('suggested-move', 'intermediate-capture', 'capture');
@@ -187,7 +182,7 @@ function clearSuggestions() {
 }
 
 /* The backtracking recursion which calculates all the possible movements */
-function backtrackMovements(r, t, rStep, tStep, doubleTileStep, friend, foe, originalPawn, captureOccured = false, capturedArr = []) { // row, tile, rowStep, tileStep
+const backtrackMovements = (r, t, rStep, tStep, doubleTileStep, friend, foe, originalPawn, captureOccured = false, capturedArr = []) => { // row, tile, rowStep, tileStep
     /* FORWARD MOVEMENT */
     if (tiles[r+rStep] && tiles[r+rStep][t+tStep] && !tiles[r+rStep][t+tStep][friend]) { // if not friend
         if (!tiles[r+rStep][t+tStep][foe]) { // if empty and the pressed pawn is not a king
@@ -251,18 +246,18 @@ function backtrackMovements(r, t, rStep, tStep, doubleTileStep, friend, foe, ori
 }
 
 /* Colors the possible paths */
-function markTiles(rowJump, tileJump, rowCap, tileCap, capturedArr) { // Cap means 'capture'
+const markTiles = (rowJump, tileJump, rowCap, tileCap, capturedArr) => { // Cap means 'capture'
     tiles[rowJump][tileJump].captured = capturedArr;
     tiles[rowJump][tileJump].classList.add('intermediate-capture');
     tiles[rowCap][tileCap].classList.add('capture');
 }
 
-function executeCapture(captured) {
+const executeCapture = captured => {
     turn == 'whitePawn' ? blackPawns -= captured.length : whitePawns -= captured.length;
     clearTiles(captured);
 }
 
-function switchTurns() {
+const switchTurns = () => {
     if (turn == 'whitePawn') {
         turn = 'blackPawn';
         knights[0].style.opacity = '0.3';
@@ -279,7 +274,7 @@ function switchTurns() {
     }
 }
 
-function checkGameOver() {
+const checkGameOver = () => {
     if (whitePawns == 0 || blackPawns == 0) {
         coverContainer.style.display = 'flex';
         cover.style.backgroundColor = 'rgba(255, 255, 255, 0.4)';
@@ -288,3 +283,29 @@ function checkGameOver() {
     }
     return false;
 }
+
+
+  /*****************/
+ /*EVENT LISTENERS*/
+/*****************/
+
+window.addEventListener('DOMContentLoaded', () => { 
+    getWidth(); 
+    setTimeout(() => loading.style.opacity = '0', 500);
+    loading.addEventListener('transitionend', () => loading.style.display = 'none');
+});
+
+window.addEventListener('resize', () => getWidth());
+
+playButton.addEventListener('click', () => { 
+    cover.addEventListener('transitionend', () => coverContainer.style.display = 'none'); // prevents the 'no cover on first launch' issue
+    playButton.style.display = rules.style.display = 'none'; 
+    cover.style.backgroundColor = 'rgba(255, 255, 255, 0)'; 
+    gameStart(); 
+});
+
+newGameButton.addEventListener('click', () => { 
+    newGameButton.style.display = 'none'; 
+    cover.style.backgroundColor = 'rgba(255, 255, 255, 0)'; 
+    gameStart(); 
+});
