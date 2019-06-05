@@ -18,7 +18,7 @@ const rules = qS('#rules');
 const playButton = qS('#play-button');
 const newGameButton = qS('#newgame-button');
 const setPawns = {
-    white: tile => { tile.classList.add('white-pawn'); tile.whitePawn = true; tile.style.cursor = 'pointer'; },
+    white: tile => { tile.classList.add('white-pawn'); tile.whitePawn = true; },
     black: tile => { tile.classList.add('black-pawn'); tile.blackPawn = true; }
 };
     
@@ -32,51 +32,11 @@ let lastSelected;
  /*FUNCTION DEFINITIONS*/
 /**********************/
 
-const getWidth = () => {
-    if (window.visualViewport) {
-        if (window.visualViewport.width >= 1200) {
-            resize(0.45, 0.1, true);
-        } else if (window.visualViewport.width <= 576) {
-            resize(0.95, 0.1, true);
-        } else {
-            resize((-1/1248) * window.visualViewport.width + (367/260), 0.1, true); // f(x) = (-1/1248)x + (367/260)
-        }
-    } 
-    else {
-        if (window.innerWidth >= 1200) {
-            resize(0.45);
-        } else if (window.innerWidth <= 576) {
-            resize(0.95);
-        } else {
-            resize((-1/1248) * window.innerWidth + (367/260)); // f(x) = (-1/1248)x + (367/260)
-        }
-    }
-}
-
-const resize = (bM, kM = 0.1, vV) => { // boardMuliplier, knightMultiplier, visualViewport
-    let boardWidth, knightWidth;
-    if (vV) {
-        boardWidth = window.visualViewport.width * bM + 'px',
-        knightWidth = window.visualViewport.width * kM + 'px';    
-    }
-    else {
-        boardWidth = window.innerWidth * bM + 'px',
-        knightWidth = window.innerWidth * kM + 'px';
-    }
-    board.style.width = board.style.height = cover.style.width = cover.style.height = boardWidth;
-    knights[0].style.width = knights[1].style.width = knightWidth;
-    root.style.fontSize = `${boardWidth.slice(0, -2) / 50}px`;
-    if (window.getComputedStyle(board).width != window.getComputedStyle(board).height) {
-        resize(bM, kM / 2, vV);
-    }
-}
-
 const gameStart = () => {
     [turn, whitePawns, blackPawns, lastSelected] = ['whitePawn', 12, 12, null];
     knights[0].style.opacity = '1';
     knights[1].style.opacity = '0.3';
     tiles.forEach(row => !row || clearTiles(row)); // tiles[0] is null
-    tiles.forEach(row => !row || row.forEach(tile => tile.style.cursor = 'default')); // removes all cursors
     fillPawns();
 }
 
@@ -106,7 +66,9 @@ const clearTiles = tilesRow => {
 
 const checkMovement = (selectedTile, row, tile) => {
     if (selectedTile.classList.contains('suggested-move')) { // if a suggested path is clicked (a pawn can move only to a suggested path)
-        if (selectedTile.captured) executeCapture(selectedTile.captured); // if the clicked tile is a suggested capture path
+        if (selectedTile.captured) { // if the clicked tile is a suggested capture path
+            executeCapture(selectedTile.captured);
+         }
         if (turn == 'whitePawn') { // white turn
             if (lastSelected.king || row == 8) { // if the previously selected pawn is a king or is about to become one
                 delete lastSelected.king; // since selectedTile and lastSelected might be the same (diamond capture scenario), this line has to be here and not outside the big 'if' statement in line 92
@@ -146,23 +108,20 @@ const checkMovement = (selectedTile, row, tile) => {
         selectedTile.classList.add('pressed-pawn');
         showSuggestions(selectedTile, row, tile);
     }
-    if (lastSelected && lastSelected != selectedTile) { 
+    if (lastSelected) { 
         lastSelected.classList.remove('pressed-pawn');
-        if (!lastSelected[turn]) {
-            lastSelected.style.cursor = 'default';   
-        }
     }
     lastSelected = selectedTile; // 'remembers' the last tile that was selected, this allows a capturer to move to its new position
 }
 
 const showSuggestions = (selectedTile, row, tile) => {
     if (turn == 'whitePawn') { // white turn
-        (row%2 == 0) ? backtrackMovements(row, tile, 1, 1, 1, 'whitePawn', 'blackPawn', selectedTile) : backtrackMovements(row, tile, 1, -1, -1, 'whitePawn', 'blackPawn', selectedTile);
+        (row % 2 == 0) ? backtrackMovements(row, tile, 1, 1, 1, 'whitePawn', 'blackPawn', selectedTile) : backtrackMovements(row, tile, 1, -1, -1, 'whitePawn', 'blackPawn', selectedTile);
     }
     else { // black turn
-        (row%2 == 0) ? backtrackMovements(row, tile, -1, 1, 1, 'blackPawn', 'whitePawn', selectedTile) : backtrackMovements(row, tile, -1, -1, -1, 'blackPawn', 'whitePawn', selectedTile);   
+        (row % 2 == 0) ? backtrackMovements(row, tile, -1, 1, 1, 'blackPawn', 'whitePawn', selectedTile) : backtrackMovements(row, tile, -1, -1, -1, 'blackPawn', 'whitePawn', selectedTile);   
     }
-    let [stepTiles, captureTiles] = [[...document.querySelectorAll('.suggested-move')], [...document.querySelectorAll('.intermediate-capture')]];
+    let [stepTiles, captureTiles] = [[...qS('.suggested-move', true)], [...qS('.intermediate-capture', true)]];
     if (captureTiles.length > 0) { // if there are captures
         stepTiles.forEach(t => t.classList.remove('suggested-move')); // removes all step tiles, since capture is mandatory for a specific pawn
         captureTiles // leaves only the max length captures
@@ -181,7 +140,7 @@ const clearSuggestions = () => {
     );
 }
 
-/* The backtracking recursion which calculates all the possible movements */
+/* A backtracking recursion that finds all of the possible movements */
 const backtrackMovements = (r, t, rStep, tStep, doubleTileStep, friend, foe, originalPawn, captureOccured = false, capturedArr = []) => { // row, tile, rowStep, tileStep
     /* FORWARD MOVEMENT */
     if (tiles[r+rStep] && tiles[r+rStep][t+tStep] && !tiles[r+rStep][t+tStep][friend]) { // if not friend
@@ -245,11 +204,11 @@ const backtrackMovements = (r, t, rStep, tStep, doubleTileStep, friend, foe, ori
     }
 }
 
-/* Colors the possible paths */
-const markTiles = (rowJump, tileJump, rowCap, tileCap, capturedArr) => { // Cap means 'capture'
+/* Colors the possible movements */
+const markTiles = (rowJump, tileJump, rowCapture, tileCapture, capturedArr) => {
     tiles[rowJump][tileJump].captured = capturedArr;
     tiles[rowJump][tileJump].classList.add('intermediate-capture');
-    tiles[rowCap][tileCap].classList.add('capture');
+    tiles[rowCapture][tileCapture].classList.add('capture');
 }
 
 const executeCapture = captured => {
@@ -262,15 +221,11 @@ const switchTurns = () => {
         turn = 'blackPawn';
         knights[0].style.opacity = '0.3';
         knights[1].style.opacity = '1';
-        qS('.white-pawn, .white-king', true).forEach(pawn => pawn.style.cursor = 'default');
-        qS('.black-pawn, .black-king', true).forEach(pawn => pawn.style.cursor = 'pointer');
     }
     else {
         turn = 'whitePawn';
         knights[0].style.opacity = '1';
         knights[1].style.opacity = '0.3';
-        qS('.black-pawn, .black-king', true).forEach(pawn => pawn.style.cursor = 'default');
-        qS('.white-pawn, .white-king', true).forEach(pawn => pawn.style.cursor = 'pointer');
     }
 }
 
@@ -290,16 +245,14 @@ const checkGameOver = () => {
 /*****************/
 
 window.addEventListener('DOMContentLoaded', () => { 
-    getWidth(); 
     setTimeout(() => loading.style.opacity = '0', 500);
-    loading.addEventListener('transitionend', () => loading.style.display = 'none');
+    loading.addEventListener('transitionend', () => document.body.removeChild(loading));
 });
-
-window.addEventListener('resize', () => getWidth());
 
 playButton.addEventListener('click', () => { 
     cover.addEventListener('transitionend', () => coverContainer.style.display = 'none'); // prevents the 'no cover on first launch' issue
-    playButton.style.display = rules.style.display = 'none'; 
+    playButton.style.display = 'none';
+    rules.style.display = 'none'; 
     cover.style.backgroundColor = 'rgba(255, 255, 255, 0)'; 
     gameStart(); 
 });

@@ -4,7 +4,6 @@ body {
     -webkit-user-select: none;
 }
 
-/* Preload so that the pawns could show up immidiately */
 body::before {
     display: none;
     content: url(images/white-pawn.png) url(images/black-pawn.png) url(images/white-king.png) url(images/black-king.png);
@@ -46,12 +45,14 @@ body::before {
 }
 
 .knight {
+    max-width: 25vmin;
     -webkit-box-reflect: below 0px -webkit-gradient(linear, left top, left bottom, from(transparent), color-stop(30%, transparent) , to(rgba(250, 250, 250, 0.2)));
     transition: opacity 0.5s;
 }
 
 #white-knight {
     transform: rotateY(180deg);
+    filter: brightness(120%);
 }
 
 #black-knight {
@@ -60,6 +61,8 @@ body::before {
 
 #board {
     display: flex;
+    width: 90vmin;
+    height: 90vmin;
     background-color: rgb(40, 40, 40);
     box-shadow: 0 0.25rem 0.5rem 0 rgba(0, 0, 0, 0.2), 0 0.375rem 1.25rem 0 rgba(0, 0, 0, 0.19);
 }
@@ -69,7 +72,7 @@ body::before {
     width: 90%;
     height: 90%;
     margin: auto;
-    border: 0.75rem solid rgb(80, 80, 80);
+    border: 1vmin solid rgb(80, 80, 80);
     box-sizing: border-box;
     grid-template-rows: repeat(8, 1fr);
     grid-template-columns: repeat(8, 1fr);
@@ -84,6 +87,8 @@ body::before {
 
 #cover {
     display: flex;
+    width: 90vmin;
+    height: 90vmin;
     flex-direction: column;
     justify-content: space-around;
     padding: 0 5rem;
@@ -95,20 +100,21 @@ body::before {
 }
 
 #rules {
-    font-size: 1.8rem;
+    font-size: 3vmin;
 }
 
 #rules h1 {
-    padding-top: 1.5rem;
-    padding-left: 1rem;
+    padding-top: 3vmin;
+    padding-left: 2vmin;
     text-align: center;
-    letter-spacing: 1rem;
-    font-size: 4rem;
+    letter-spacing: 2vmin;
+    font-size: 7vmin;
 }
 
 #rules ul {
     list-style: none;
-    font-size: 1.6rem;
+    font-size: 2.6vmin;
+    font-style: italic;
 }
 
 /*Diamonds */
@@ -134,7 +140,7 @@ body::before {
     box-sizing: border-box;
     border: 0.05rem solid white;
     border-radius: 0.4rem;
-    font-size: 3rem;
+    font-size: 6vmin;
     color: white;
     background-color: rgba(200, 200, 200, 0.6);
     -webkit-text-stroke: 0.05rem gray;
@@ -169,7 +175,6 @@ body::before {
 
 .white-pawn {
     background-image: url(images/white-pawn.png);
-    cursor: pointer;
 }
 
 .black-pawn {
@@ -199,9 +204,20 @@ body::before {
     transition: background-color 0.5s;
 }
 
-@media (max-width: 768px) {
+
+  /***************/
+ /*MEDIA QUERIES*/
+/***************/
+
+/* iPad & iPad Pro */
+@media (max-width: 1024px) {
     #flex-container {
         flex-direction: column;
+    }
+
+    .knight {
+        max-width: 10vmin;
+        max-height: 10vmin;
     }
     
     #black-knight {
@@ -218,5 +234,22 @@ body::before {
     
     #white-knight {
         order: 3;
+    }
+}
+
+/* Mobile */
+@media (max-width: 450px) {
+    .knight {
+        max-width: 20vmin;
+        max-height: 20vmin;
+    }
+
+    #cover, #board {
+        width: 95vmin;
+        height: 95vmin;
+    }
+
+    #rules ul {
+        margin-left: -8vmin;
     }
 }
