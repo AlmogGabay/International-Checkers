@@ -249,6 +249,14 @@ window.addEventListener('DOMContentLoaded', () => {
     loading.addEventListener('transitionend', () => document.body.removeChild(loading));
 });
 
+knights.forEach(knight => knight.addEventListener('click', 
+    () => {
+        if (confirm('Restart the game?')) {
+            gameStart();
+        }
+    })
+);
+
 playButton.addEventListener('click', () => { 
     cover.addEventListener('transitionend', () => coverContainer.style.display = 'none'); // prevents the 'no cover on first launch' issue
     playButton.style.display = 'none';
