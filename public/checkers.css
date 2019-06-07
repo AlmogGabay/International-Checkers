@@ -4,11 +4,6 @@ body {
     -webkit-user-select: none;
 }
 
-body::before {
-    display: none;
-    content: url(images/white-pawn.png) url(images/black-pawn.png) url(images/white-king.png) url(images/black-king.png);
-} 
-
 #loading {
     position: absolute;
     width: 100%;
@@ -174,19 +169,19 @@ body::before {
 }
 
 .white-pawn {
-    background-image: url(images/white-pawn.png);
+    background-image: url(images/white-pawn.svg);
 }
 
 .black-pawn {
-    background-image: url(images/black-pawn.png);
+    background-image: url(images/black-pawn.svg);
 }
 
 .white-king {
-    background-image: url(images/white-king.png);
+    background-image: url(images/white-king.svg);
 }
 
 .black-king {
-    background-image: url(images/black-king.png);
+    background-image: url(images/black-king.svg);
 }
 
 .suggested-move {
