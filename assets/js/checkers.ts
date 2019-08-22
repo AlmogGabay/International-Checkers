@@ -2,17 +2,24 @@
  /*VARIABLE DEFINITIONS*/
 /**********************/
 
-const qS = (selector: string): any => document.querySelector(selector);
-const qSA = (selector: string): any => document.querySelectorAll(selector);
+const qS = (selector: string): HTMLElement => document.querySelector(selector);
+const qSA = (selector: string): NodeListOf<HTMLElement> => document.querySelectorAll(selector);
 
-const loading: any = qS('#loading');
-const knights: any = qSA('.knight');
-const coverContainer: any = qS('#cover-flex-container');
-const cover: any = qS('#cover');
-const rules: any = qS('#rules');
-const playButton: any = qS('#play-button');
-const newGameButton: any = qS('#newgame-button');
-const tiles: any[] = [
+interface TileElement extends HTMLElement {
+    whitePawn?: boolean,
+    blackPawn?: boolean,
+    king?: boolean,
+    captured?: TileElement[]
+}
+
+const loading: HTMLDivElement = qS('#loading') as HTMLDivElement;
+const knights: NodeListOf<HTMLImageElement> = qSA('.knight') as NodeListOf<HTMLImageElement>;
+const coverContainer: HTMLDivElement = qS('#cover-flex-container') as HTMLDivElement;
+const cover: HTMLDivElement = qS('#cover') as HTMLDivElement;
+const rules: HTMLDivElement = qS('#rules') as HTMLDivElement;
+const playButton: HTMLDivElement = qS('#play-button') as HTMLDivElement;
+const newGameButton: HTMLDivElement = qS('#newgame-button') as HTMLDivElement;
+const tiles: NodeListOf<TileElement>[] = [
     null, 
     qSA('.first'), 
     qSA('.second'), 
@@ -24,10 +31,10 @@ const tiles: any[] = [
     qSA('.eighth')
 ];
     
-let turn: string;
+let turn: 'whitePawn' | 'blackPawn';
 let whitePawns: number;
 let blackPawns: number;
-let lastSelected: any;
+let lastSelected: TileElement;
 
 
   /**********************/
@@ -46,32 +53,34 @@ const gameStart = (): void => {
 const fillPawns = (): void => {
     tiles.forEach((row, rowIndex) => {
         if (rowIndex >= 1 && rowIndex <= 3) {
-            row.forEach((tile: any) => setPawn('whitePawn', tile));
+            row.forEach((tile: TileElement) => setPawn('whitePawn', tile));
         } else if (rowIndex >= 6 && rowIndex <= 8) {
-            row.forEach((tile: any) => setPawn('blackPawn', tile));
+            row.forEach((tile: TileElement) => setPawn('blackPawn', tile));
         }
     });
     tiles.forEach((row, rowIndex) =>
-        !row || row.forEach((tile: any, tileIndex: number) =>
+        !row || row.forEach((tile: TileElement, tileIndex: number) =>
             tile.addEventListener('click', () => checkChosenPath(tile, rowIndex, tileIndex))
         )
     );
 };
 
-const setPawn = (pawnColor: string, tile: any): void => {
+const setPawn = (pawnColor: 'whitePawn' | 'blackPawn', tile: TileElement): void => {
     tile.classList.add(pawnColor == 'whitePawn' ? 'white-pawn' : 'black-pawn');
-    tile[pawnColor] = true;
+    tile[pawnColor] = true
 };
 
 /* Clears all previous pawns */
-const clearTiles = (tilesRow: any): void => {
-    tilesRow.forEach((tile: any) => { 
+const clearTiles = (tilesRow: NodeListOf<TileElement> | TileElement[]): void => {
+    tilesRow.forEach((tile: TileElement) => { 
         tile.classList.remove('white-pawn', 'black-pawn', 'white-king', 'black-king'); 
-        delete tile.whitePawn; delete tile.blackPawn; delete tile.king; 
+        delete tile.whitePawn; 
+        delete tile.blackPawn; 
+        delete tile.king;
     });
 };
 
-const checkChosenPath = (selectedTile: any, row: number, tile: number): void => {
+const checkChosenPath = (selectedTile: TileElement, row: number, tile: number): void => {
     if (selectedTile.classList.contains('suggested-move')) { // if a suggested path is taken (a pawn can move only to a suggested path)
         if (selectedTile.captured) { // if the pressed tile is a suggested capture path
             executeCapture(selectedTile.captured);
@@ -118,7 +127,7 @@ const checkChosenPath = (selectedTile: any, row: number, tile: number): void => 
     lastSelected = selectedTile; // 'remembers' the last tile that was selected, this allows a capturer to move to its new position
 };
 
-const paths = (selectedTile: any, row: number, tile: number): void => {
+const paths = (selectedTile: TileElement, row: number, tile: number): void => {
     if (turn == 'whitePawn') { // white turn
         (row % 2 == 0) ? 
         findPaths(row, tile, 1, 1, 1, 'whitePawn', 'blackPawn', selectedTile) : 
@@ -129,8 +138,8 @@ const paths = (selectedTile: any, row: number, tile: number): void => {
         findPaths(row, tile, -1, -1, -1, 'blackPawn', 'whitePawn', selectedTile);   
     }
     
-    const stepTiles = [...qSA('.suggested-move')];
-    const captureTiles = [...qSA('.intermediate-capture')];
+    const stepTiles: TileElement[] = [...qSA('.suggested-move')];
+    const captureTiles: TileElement[] = [...qSA('.intermediate-capture')];
     
     if (captureTiles.length > 0) { // if there are captures
         filterPaths(stepTiles, captureTiles);
@@ -139,7 +148,7 @@ const paths = (selectedTile: any, row: number, tile: number): void => {
 
 const clearSuggestions = (): void => {
     tiles.forEach(row => 
-        !row || row.forEach((tile: any) => {
+        !row || row.forEach((tile: TileElement) => {
             tile.classList.remove('suggested-move', 'intermediate-capture', 'capture');
             delete tile.captured;
         })
@@ -153,11 +162,11 @@ const findPaths = (
     rStep: number, 
     tStep: number, 
     doubleTileStep: number, 
-    friend: string, 
-    foe: string, 
-    originalPawn: any, 
+    friend: 'whitePawn' | 'blackPawn', 
+    foe: 'whitePawn' | 'blackPawn',
+    originalPawn: TileElement, 
     captureOccured: boolean = false, 
-    capturedArr: NodeListOf<Element>[] = []
+    capturedArr: TileElement[] = []
 ): void => {
     /* FORWARD MOVEMENT */
     if (tiles[row+rStep] && tiles[row+rStep][tile+tStep] && !tiles[row+rStep][tile+tStep][friend]) { // if not friend
@@ -222,14 +231,14 @@ const showPaths = (
     tileJump: number, 
     rowCapture: number, 
     tileCapture: number, 
-    capturedArr: any[]
+    capturedArr: TileElement[]
 ): void => {
     tiles[rowJump][tileJump].captured = capturedArr;
     tiles[rowJump][tileJump].classList.add('intermediate-capture');
     tiles[rowCapture][tileCapture].classList.add('capture');
 };
 
-const filterPaths = (stepTiles: any[], captureTiles: any[]): void => {
+const filterPaths = (stepTiles: TileElement[], captureTiles: TileElement[]): void => {
     stepTiles.forEach(tile => tile.classList.remove('suggested-move')); // removes all step tiles, since capture is mandatory for a specific pawn
     captureTiles // leaves only the max length captures
         .sort((a, b) => b.captured.length - a.captured.length)
@@ -237,7 +246,7 @@ const filterPaths = (stepTiles: any[], captureTiles: any[]): void => {
         .forEach(tile => { tile.classList.remove('intermediate-capture'); tile.classList.add('suggested-move'); });
 };
 
-const executeCapture = (captured: any[]): void => {
+const executeCapture = (captured: TileElement[]): void => {
     turn == 'whitePawn' ? blackPawns -= captured.length : whitePawns -= captured.length;
     clearTiles(captured);
 };
@@ -274,7 +283,7 @@ window.addEventListener('DOMContentLoaded', () => {
     loading.addEventListener('transitionend', () => document.body.removeChild(loading));
 });
 
-knights.forEach((knight: any) => knight.addEventListener('click', 
+knights.forEach((knight: HTMLImageElement) => knight.addEventListener('click', 
     () => {
         if (confirm('Restart the game?')) {
             gameStart();
