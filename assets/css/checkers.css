@@ -227,19 +227,18 @@ body {
 
 .suggested-move-white-pawn {
   background-image: url(../images/white-pawn.svg);
-  opacity: 0.25;
+  opacity: 0.4;
 }
 
 .suggested-move-black-pawn {
   background-image: url(../images/black-pawn.svg);
-  opacity: 0.25;
+  opacity: 0.4;
 }
 
 .intermediate-capture {
-  background-color: rgba(255, 255, 255, 0.75);
-  background-image: url(../images/intermediate-capture.png);
-  -webkit-box-shadow: 0.05rem 0.05rem 0.2rem 0.2rem inset;
-          box-shadow: 0.05rem 0.05rem 0.2rem 0.2rem inset;
+  border-radius: 100%;
+  -webkit-box-shadow: 0.05rem 0.05rem 0.2rem 0.2rem #505050 inset;
+          box-shadow: 0.05rem 0.05rem 0.2rem 0.2rem #505050 inset;
   -webkit-transition: -webkit-box-shadow 0.2s;
   transition: -webkit-box-shadow 0.2s;
   transition: box-shadow 0.2s;
