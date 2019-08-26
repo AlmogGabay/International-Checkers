@@ -86,7 +86,7 @@ body {
 
 #rules ul {
   list-style: none;
-  font-size: 2.6vmin;
+  font-size: 2.5vmin;
   font-style: italic;
   text-align: initial;
 }
@@ -191,7 +191,7 @@ body {
 
 #board #inner-border div {
   /* Tiles */
-  background-size: 95%;
+  background-size: 90%;
   background-position: center;
   background-repeat: no-repeat;
 }
@@ -236,18 +236,21 @@ body {
 }
 
 .intermediate-capture {
+  width: 90%;
+  height: 90%;
+  -ms-flex-item-align: center;
+      -ms-grid-row-align: center;
+      align-self: center;
+  -ms-grid-column-align: center;
+      justify-self: center;
   border-radius: 100%;
   -webkit-box-shadow: 0.05rem 0.05rem 0.2rem 0.2rem #505050 inset;
           box-shadow: 0.05rem 0.05rem 0.2rem 0.2rem #505050 inset;
-  -webkit-transition: -webkit-box-shadow 0.2s;
-  transition: -webkit-box-shadow 0.2s;
-  transition: box-shadow 0.2s;
-  transition: box-shadow 0.2s, -webkit-box-shadow 0.2s;
 }
 
 .capture {
   background-color: red;
-  border-radius: 40%;
+  border-radius: 50%;
   -webkit-animation: captured 2s infinite;
           animation: captured 2s infinite;
 }
@@ -256,7 +259,7 @@ body {
   0% {
     background-color: transparent;
   }
-  75% {
+  80% {
     background-color: red;
   }
   100% {
@@ -268,7 +271,7 @@ body {
   0% {
     background-color: transparent;
   }
-  75% {
+  80% {
     background-color: red;
   }
   100% {

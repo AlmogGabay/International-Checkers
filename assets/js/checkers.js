@@ -55,7 +55,7 @@ var gameStart = function () {
     _a = __read(['white-pawn', 12, 12, null], 4), turn = _a[0], whitePawns = _a[1], blackPawns = _a[2], lastSelected = _a[3];
     knights[0].style.opacity = '1';
     knights[1].style.opacity = '0.3';
-    tiles.forEach(function (row) { return !row || clearTiles(row); }); // tiles[0] is null
+    tiles.forEach(function (row) { return row && clearTiles(row); }); // tiles[0] is null
     fillPawns();
 };
 /* Places all the pawns in their initial position */
@@ -69,7 +69,7 @@ var fillPawns = function () {
         }
     });
     tiles.forEach(function (row, rowIndex) {
-        return !row || row.forEach(function (tile, tileIndex) {
+        return row && row.forEach(function (tile, tileIndex) {
             return tile.addEventListener('click', function () { return checkChosenPath(tile, rowIndex, tileIndex); });
         });
     });
@@ -155,7 +155,7 @@ var paths = function (selectedTile, row, tile) {
 };
 var clearSuggestions = function () {
     tiles.forEach(function (row) {
-        return !row || row.forEach(function (tile) {
+        return row && row.forEach(function (tile) {
             tile.classList.remove('suggested-move-white-pawn', 'suggested-move-black-pawn', 'intermediate-capture', 'capture');
             delete tile.captured;
         });

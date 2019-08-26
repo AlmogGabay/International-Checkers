@@ -46,7 +46,7 @@ const gameStart = (): void => {
     [turn, whitePawns, blackPawns, lastSelected] = ['white-pawn', 12, 12, null];
     knights[0].style.opacity = '1';
     knights[1].style.opacity = '0.3';
-    tiles.forEach(row => !row || clearTiles(row)); // tiles[0] is null
+    tiles.forEach(row => row && clearTiles(row)); // tiles[0] is null
     fillPawns();
 };
 
@@ -60,7 +60,7 @@ const fillPawns = (): void => {
         }
     });
     tiles.forEach((row, rowIndex) =>
-        !row || row.forEach((tile: TileElement, tileIndex: number) =>
+        row && row.forEach((tile: TileElement, tileIndex: number) =>
             tile.addEventListener('click', () => checkChosenPath(tile, rowIndex, tileIndex))
         )
     );
@@ -149,7 +149,7 @@ const paths = (selectedTile: TileElement, row: number, tile: number): void => {
 
 const clearSuggestions = (): void => {
     tiles.forEach(row => 
-        !row || row.forEach((tile: TileElement) => {
+        row && row.forEach((tile: TileElement) => {
             tile.classList.remove('suggested-move-white-pawn', 'suggested-move-black-pawn', 'intermediate-capture', 'capture');
             delete tile.captured;
         })

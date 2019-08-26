@@ -66,7 +66,7 @@ body {
     
     ul {
         list-style: none;
-        font-size: 2.6vmin;
+        font-size: 2.5vmin;
         font-style: italic;
         text-align: initial;
         
@@ -152,7 +152,7 @@ body {
         
         div {
             /* Tiles */
-            background-size: 95%;
+            background-size: 90%;
             background-position: center;
             background-repeat: no-repeat;
         }
@@ -198,20 +198,23 @@ body {
 }
 
 .intermediate-capture {
+    width: 90%;
+    height: 90%;
+    align-self: center;
+    justify-self: center;
     border-radius: 100%;
     box-shadow: 0.05rem 0.05rem 0.2rem 0.2rem rgb(80, 80, 80) inset;
-    transition: box-shadow 0.2s;
 }
 
 .capture {
     background-color: red;
-    border-radius: 40%;
+    border-radius: 50%;
     animation: captured 2s infinite;
 }
 
 @keyframes captured {
     0% { background-color: transparent; }
-    75% { background-color: red; }
+    80% { background-color: red; }
     100% { background-color: transparent; }
 }
 
