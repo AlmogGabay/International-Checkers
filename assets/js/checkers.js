@@ -47,6 +47,7 @@ var turn;
 var whitePawns;
 var blackPawns;
 var lastSelected;
+var paths = [];
 /**********************/
 /*FUNCTION DEFINITIONS*/
 /**********************/
@@ -89,8 +90,9 @@ var clearTiles = function (tilesRow) {
 };
 var checkChosenPath = function (selectedTile, row, tile) {
     if (selectedTile.classList.contains('suggested-move-' + turn)) { // if a suggested path is taken (a pawn can move only to a suggested path)
-        if (selectedTile.captured) { // if the pressed tile is a suggested capture path
-            executeCapture(selectedTile.captured);
+        if (paths[0].length > 1) { // if the pressed tile is a suggested capture path
+            var chosenPath = paths.filter(function (path) { return __spread(path).includes(selectedTile); }).flat();
+            executeStep(chosenPath);
         }
         if (turn == 'white-pawn') { // white turn
             if (lastSelected.king || row == 8) { // if the previously selected pawn is a king or is about to become one
@@ -126,123 +128,124 @@ var checkChosenPath = function (selectedTile, row, tile) {
             switchTurns();
         }
     }
-    clearSuggestions();
+    clearPaths(null, lastSelected);
     if (selectedTile[turn == 'white-pawn' ? 'whitePawn' : 'blackPawn'] && !checkGameOver()) { // if a current turn pawn is selected (checkGameOver prevents the issue when the final move is clicked twice and shows suggestions even after the game is over)
         selectedTile.classList.add('pressed-pawn');
-        paths(selectedTile, row, tile);
-    }
-    if (lastSelected) {
-        lastSelected.classList.remove('pressed-pawn');
+        handlePaths(selectedTile, row, tile);
     }
     lastSelected = selectedTile; // 'remembers' the last tile that was selected, this allows a capturer to move to its new position
 };
-var paths = function (selectedTile, row, tile) {
+var handlePaths = function (selectedTile, row, tile) {
     if (turn == 'white-pawn') { // white turn
         (row % 2 == 0) ?
-            findPaths(row, tile, 1, 1, 1, 'whitePawn', 'blackPawn', selectedTile) :
-            findPaths(row, tile, 1, -1, -1, 'whitePawn', 'blackPawn', selectedTile);
+            paths = findPaths(row, tile, 1, 1, 1, 'whitePawn', 'blackPawn', selectedTile) :
+            paths = findPaths(row, tile, 1, -1, -1, 'whitePawn', 'blackPawn', selectedTile);
     }
     else { // black turn
         (row % 2 == 0) ?
-            findPaths(row, tile, -1, 1, 1, 'blackPawn', 'whitePawn', selectedTile) :
-            findPaths(row, tile, -1, -1, -1, 'blackPawn', 'whitePawn', selectedTile);
+            paths = findPaths(row, tile, -1, 1, 1, 'blackPawn', 'whitePawn', selectedTile) :
+            paths = findPaths(row, tile, -1, -1, -1, 'blackPawn', 'whitePawn', selectedTile);
     }
-    var stepTiles = __spread(qSA('.suggested-move-' + turn));
-    var captureTiles = __spread(qSA('.intermediate-capture'));
-    if (captureTiles.length > 0) { // if there are captures
-        filterPaths(stepTiles, captureTiles);
-    }
+    paths.forEach(function (path) { return path.forEach(function (tile, ind) {
+        if (ind == path.length - 1) {
+            tile.classList.add('suggested-move-' + turn);
+        }
+        else if (ind % 2 == 0) {
+            tile.classList.add('capture');
+        }
+        else {
+            tile.classList.add('intermediate-capture');
+        }
+    }); });
 };
-var clearSuggestions = function () {
-    tiles.forEach(function (row) {
-        return row && row.forEach(function (tile) {
-            tile.classList.remove('suggested-move-white-pawn', 'suggested-move-black-pawn', 'intermediate-capture', 'capture');
-            delete tile.captured;
+var clearPaths = function (chosenPath, lastSelected) {
+    paths.forEach(function (path) { return path.forEach(function (tile) {
+        tile.classList.remove('intermediate-capture', 'capture', 'suggested-move-white-pawn', 'suggested-move-black-pawn');
+        delete tile.stepped;
+    }); });
+    if (chosenPath) {
+        chosenPath.forEach(function (tile) {
+            tile.classList.remove('white-pawn', 'black-pawn', 'white-king', 'black-king');
+            delete tile.whitePawn;
+            delete tile.blackPawn;
+            delete tile.king;
         });
-    });
+    }
+    paths = [];
+    if (lastSelected) {
+        lastSelected.classList.remove('pressed-pawn');
+        delete lastSelected.stepped;
+    }
 };
-/* A backtracking recursion that finds all of the possible movements */
-var findPaths = function (row, tile, rStep, tStep, doubleTileStep, friend, foe, originalPawn, captureOccured, capturedArr) {
+/* A backtracking recursion that finds all of the possible paths */
+var findPaths = function (row, tile, rStep, tStep, doubleTileStep, friend, foe, originalPawn, captureOccured, path) {
     if (captureOccured === void 0) { captureOccured = false; }
-    if (capturedArr === void 0) { capturedArr = []; }
+    if (path === void 0) { path = []; }
+    var pathsArr = [];
+    tiles[row][tile].stepped = true;
     /* FORWARD MOVEMENT */
     if (tiles[row + rStep] && tiles[row + rStep][tile + tStep] && !tiles[row + rStep][tile + tStep][friend]) { // if not friend
-        if (!tiles[row + rStep][tile + tStep][foe]) { // if empty and the pressed pawn is not a king
-            if (!captureOccured || originalPawn.king)
-                tiles[row + rStep][tile + tStep].classList.add('suggested-move-' + turn); // a step without a capture
+        if (!tiles[row + rStep][tile + tStep][foe]) { // if empty
+            if (!captureOccured) { // a step without a capture
+                pathsArr.push(__spread(path, [tiles[row + rStep][tile + tStep]]));
+            }
         }
-        else if (tiles[row + rStep * 2] && tiles[row + rStep * 2][tile + doubleTileStep] && !tiles[row + rStep * 2][tile + doubleTileStep].captured) { // if jump tile exists AND has no captured
-            if (!tiles[row + rStep * 2][tile + doubleTileStep][friend] && !tiles[row + rStep * 2][tile + doubleTileStep][foe] || tiles[row + rStep * 2][tile + doubleTileStep] == originalPawn && capturedArr.length >= 3) { // if jump tile is empty OR if jump tile equals the pressed tile AND at least 3 captures have been marked
-                capturedArr.push(tiles[row + rStep][tile + tStep]);
-                showPaths(row + rStep * 2, tile + doubleTileStep, row + rStep, tile + tStep, capturedArr.slice());
-                findPaths(row + rStep * 2, tile + doubleTileStep, rStep, tStep, doubleTileStep, friend, foe, originalPawn, true, capturedArr.slice());
-                capturedArr.pop();
+        else if (tiles[row + rStep * 2] && tiles[row + rStep * 2][tile + doubleTileStep]) { // if jump tile exists
+            if ( // if jump tile is empty AND hasn't been stepped on OR if jump tile is the pressed pawn AND at least 5 tiles have been passed through 
+            !tiles[row + rStep * 2][tile + doubleTileStep][friend] && !tiles[row + rStep * 2][tile + doubleTileStep][foe] && !tiles[row + rStep * 2][tile + doubleTileStep].stepped
+                || tiles[row + rStep * 2][tile + doubleTileStep] == originalPawn && path.length >= 5) {
+                pathsArr.push.apply(pathsArr, __spread(findPaths(row + rStep * 2, tile + doubleTileStep, rStep, tStep, doubleTileStep, friend, foe, originalPawn, true, __spread(path, [tiles[row + rStep][tile + tStep], tiles[row + rStep * 2][tile + doubleTileStep]]))));
             }
         }
     }
     if (tiles[row + rStep] && tiles[row + rStep][tile] && !tiles[row + rStep][tile][friend]) {
         if (!tiles[row + rStep][tile][foe]) {
-            if (!captureOccured || originalPawn.king)
-                tiles[row + rStep][tile].classList.add('suggested-move-' + turn);
+            if (!captureOccured) {
+                pathsArr.push(__spread(path, [tiles[row + rStep][tile]]));
+            }
         }
-        else if (tiles[row + rStep * 2] && tiles[row + rStep * 2][tile - doubleTileStep] && !tiles[row + rStep * 2][tile - doubleTileStep].captured) {
-            if (!tiles[row + rStep * 2][tile - doubleTileStep][friend] && !tiles[row + rStep * 2][tile - doubleTileStep][foe] || tiles[row + rStep * 2][tile - doubleTileStep] == originalPawn && capturedArr.length >= 3) {
-                capturedArr.push(tiles[row + rStep][tile]);
-                showPaths(row + rStep * 2, tile - doubleTileStep, row + rStep, tile, capturedArr.slice());
-                findPaths(row + rStep * 2, tile - doubleTileStep, rStep, tStep, doubleTileStep, friend, foe, originalPawn, true, capturedArr.slice());
-                capturedArr.pop();
+        else if (tiles[row + rStep * 2] && tiles[row + rStep * 2][tile - doubleTileStep]) {
+            if (!tiles[row + rStep * 2][tile - doubleTileStep][friend] && !tiles[row + rStep * 2][tile - doubleTileStep][foe] && !tiles[row + rStep * 2][tile - doubleTileStep].stepped ||
+                tiles[row + rStep * 2][tile - doubleTileStep] == originalPawn && path.length >= 5) {
+                pathsArr.push.apply(pathsArr, __spread(findPaths(row + rStep * 2, tile - doubleTileStep, rStep, tStep, doubleTileStep, friend, foe, originalPawn, true, __spread(path, [tiles[row + rStep][tile], tiles[row + rStep * 2][tile - doubleTileStep]]))));
             }
         }
     }
     /* BACKWARD MOVEMENT */
     if (tiles[row - rStep] && tiles[row - rStep][tile + tStep] && !tiles[row - rStep][tile + tStep][friend]) {
         if (tiles[row - rStep][tile + tStep][foe]) {
-            if (tiles[row - rStep * 2] && tiles[row - rStep * 2][tile + doubleTileStep] && !tiles[row - rStep * 2][tile + doubleTileStep].captured) {
-                if (!tiles[row - rStep * 2][tile + doubleTileStep][friend] && !tiles[row - rStep * 2][tile + doubleTileStep][foe] || tiles[row - rStep * 2][tile + doubleTileStep] == originalPawn && capturedArr.length >= 3) {
-                    capturedArr.push(tiles[row - rStep][tile + tStep]);
-                    showPaths(row - rStep * 2, tile + doubleTileStep, row - rStep, tile + tStep, capturedArr.slice());
-                    findPaths(row - rStep * 2, tile + doubleTileStep, rStep, tStep, doubleTileStep, friend, foe, originalPawn, true, capturedArr.slice());
-                    capturedArr.pop();
+            if (tiles[row - rStep * 2] && tiles[row - rStep * 2][tile + doubleTileStep]) {
+                if (!tiles[row - rStep * 2][tile + doubleTileStep][friend] && !tiles[row - rStep * 2][tile + doubleTileStep][foe] && !tiles[row - rStep * 2][tile + doubleTileStep].stepped
+                    || tiles[row - rStep * 2][tile + doubleTileStep] == originalPawn && path.length >= 5) {
+                    pathsArr.push.apply(pathsArr, __spread(findPaths(row - rStep * 2, tile + doubleTileStep, rStep, tStep, doubleTileStep, friend, foe, originalPawn, true, __spread(path, [tiles[row - rStep][tile + tStep], tiles[row - rStep * 2][tile + doubleTileStep]]))));
                 }
             }
         }
-        else if (originalPawn.king) {
-            tiles[row - rStep][tile + tStep].classList.add('suggested-move-' + turn); // only a king is allowed to move backwards without a capture
+        else if (originalPawn.king && !captureOccured) {
+            pathsArr.push(__spread(path, [tiles[row - rStep][tile + tStep]])); // only a king is allowed to move backwards without a capture
         }
     }
     if (tiles[row - rStep] && tiles[row - rStep][tile] && !tiles[row - rStep][tile][friend]) {
         if (tiles[row - rStep][tile][foe]) {
-            if (tiles[row - rStep * 2] && tiles[row - rStep * 2][tile - doubleTileStep] && !tiles[row - rStep * 2][tile - doubleTileStep].captured) {
-                if (!tiles[row - rStep * 2][tile - doubleTileStep][friend] && !tiles[row - rStep * 2][tile - doubleTileStep][foe] || tiles[row - rStep * 2][tile - doubleTileStep] == originalPawn && capturedArr.length >= 3) {
-                    capturedArr.push(tiles[row - rStep][tile]);
-                    showPaths(row - rStep * 2, tile - doubleTileStep, row - rStep, tile, capturedArr.slice());
-                    findPaths(row - rStep * 2, tile - doubleTileStep, rStep, tStep, doubleTileStep, friend, foe, originalPawn, true, capturedArr.slice());
+            if (tiles[row - rStep * 2] && tiles[row - rStep * 2][tile - doubleTileStep]) {
+                if (!tiles[row - rStep * 2][tile - doubleTileStep][friend] && !tiles[row - rStep * 2][tile - doubleTileStep][foe] && !tiles[row - rStep * 2][tile - doubleTileStep].stepped
+                    || tiles[row - rStep * 2][tile - doubleTileStep] == originalPawn && path.length >= 5) {
+                    pathsArr.push.apply(pathsArr, __spread(findPaths(row - rStep * 2, tile - doubleTileStep, rStep, tStep, doubleTileStep, friend, foe, originalPawn, true, __spread(path, [tiles[row - rStep][tile], tiles[row - rStep * 2][tile - doubleTileStep]]))));
                 }
             }
         }
-        else if (originalPawn.king) {
-            tiles[row - rStep][tile].classList.add('suggested-move-' + turn);
+        else if (originalPawn.king && !captureOccured) {
+            pathsArr.push(__spread(path, [tiles[row - rStep][tile]]));
         }
     }
+    if (pathsArr.length > 0) {
+        return pathsArr.sort(function (a, b) { return b.length - a.length; }).filter(function (path) { return path.length == pathsArr[0].length; });
+    }
+    return [__spread(path)];
 };
-var showPaths = function (rowJump, tileJump, rowCapture, tileCapture, capturedArr) {
-    tiles[rowJump][tileJump].captured = capturedArr;
-    tiles[rowJump][tileJump].classList.add('intermediate-capture');
-    tiles[rowCapture][tileCapture].classList.add('capture');
-};
-var filterPaths = function (stepTiles, captureTiles) {
-    stepTiles.forEach(function (tile) { return tile.classList.remove('suggested-move-' + turn); }); // removes all step tiles, since capture is mandatory for a specific pawn
-    captureTiles // leaves only the max length captures
-        .sort(function (a, b) { return b.captured.length - a.captured.length; })
-        .filter(function (tile) { return tile.captured.length == captureTiles[0].captured.length; })
-        .forEach(function (tile) {
-        tile.classList.remove('intermediate-capture');
-        tile.classList.add('suggested-move-' + turn);
-    });
-};
-var executeCapture = function (captured) {
-    turn == 'white-pawn' ? blackPawns -= captured.length : whitePawns -= captured.length;
-    clearTiles(captured);
+var executeStep = function (chosenPath) {
+    turn == 'white-pawn' ? blackPawns -= chosenPath.length / 2 : whitePawns -= chosenPath.length / 2;
+    clearPaths(chosenPath);
 };
 var switchTurns = function () {
     if (turn == 'white-pawn') {
