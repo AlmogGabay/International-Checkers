@@ -98,11 +98,11 @@ const checkChosenPath = (selectedTile: TileElement, row: number, tile: number): 
     if (selectedTile.classList.contains('suggested-move-' + turn)) {
         if (paths[0].length > 1) {
             const chosenPath: TileElement[] = paths.filter((path: TileElement[]) => path.includes(selectedTile))[0]; // [0] is to prevent a reversed diamond capture
-            performStep(chosenPath);
+            move(chosenPath);
         }
         if (turn == 'white-pawn') { // white turn
             if (lastSelected.king || row == 8) { // if the previously selected pawn is a king or is about to become one
-                delete lastSelected.king; // since selectedTile and lastSelected might be the same (diamond capture scenario), this line has to be here and not outside the big 'if' statement
+                delete lastSelected.king;
                 selectedTile.classList.add('white-king');
                 selectedTile.king = true;   
             } else {
@@ -139,7 +139,7 @@ const checkChosenPath = (selectedTile: TileElement, row: number, tile: number): 
     lastSelected = selectedTile; // 'remembers' the last tile that was selected, this allows a capturer to move to its new position
 };
 
-const performStep = (chosenPath: TileElement[]): void => {
+const move = (chosenPath: TileElement[]): void => {
     turn == 'white-pawn' ? blackPawns -= chosenPath.length / 2 : whitePawns -= chosenPath.length / 2;
     clearPaths(chosenPath);
 };
@@ -173,11 +173,11 @@ const clearPaths = (chosenPath: TileElement[], lastSelected?: TileElement): void
 };
 
 const handlePaths = (selectedTile: TileElement, row: number, tile: number): void => {
-    if (turn == 'white-pawn') { // white turn
+    if (turn == 'white-pawn') {
         (row % 2 == 0) ? 
         paths = findPaths(row, tile, 1, 1, 1, 'whitePawn', 'blackPawn', selectedTile) : 
         paths = findPaths(row, tile, 1, -1, -1, 'whitePawn', 'blackPawn', selectedTile);
-    } else { // black turn
+    } else {
         (row % 2 == 0) ? 
         paths = findPaths(row, tile, -1, 1, 1, 'blackPawn', 'whitePawn', selectedTile) : 
         paths = findPaths(row, tile, -1, -1, -1, 'blackPawn', 'whitePawn', selectedTile);   
@@ -254,8 +254,8 @@ const findPaths = (
                     pathsArr.push(...findPaths(row-rStep*2, tile+doubleTileStep, rStep, tStep, doubleTileStep, friend, foe, originalPawn, true, [ ...path, tiles[row-rStep][tile+tStep], tiles[row-rStep*2][tile+doubleTileStep] ]));
                 }
             }
-        } else if (originalPawn.king && !captureOccured) {
-            pathsArr.push([ ...path, tiles[row-rStep][tile+tStep] ]); // only a king is allowed to move backwards without a capture
+        } else if (originalPawn.king && !captureOccured) { // only a king is allowed to move backwards without a capture
+            pathsArr.push([ ...path, tiles[row-rStep][tile+tStep] ]);
         }
     }
     
@@ -323,7 +323,7 @@ knights.forEach((knight: HTMLImageElement) => knight.addEventListener('click',
 );
 
 playButton.addEventListener('click', () => { 
-    cover.addEventListener('transitionend', () => coverContainer.style.display = 'none'); // prevents the 'no cover on first launch' issue
+    cover.addEventListener('transitionend', () => coverContainer.style.display = 'none');
     playButton.style.display = 'none';
     rules.style.display = 'none'; 
     cover.style.backgroundColor = 'rgba(255, 255, 255, 0)';

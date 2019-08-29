@@ -46,32 +46,29 @@ body {
     justify-content: space-around;
     padding: 0 5rem;
     box-sizing: border-box;
-    background-color: rgba(255, 255, 255, 0.75);
-    font-family: 'Cinzel', serif;
-    text-shadow: 0.2rem 0.2rem 4px gray;
+    background-color: rgba(255, 255, 255, 0.5);
+    font-family: 'Cormorant Infant', serif;
+    text-shadow: 0.05rem 0.05rem 4px;
     transition: background-color 0.5s;
 }
 
 #rules {
-    font-size: 3vmin;
+    font-size: 4vmin;
     text-align: center;
     color: rgb(85, 85, 85);
     
     h1 {
-        padding-left: 2vmin;
-        letter-spacing: 2vmin;
         font-size: 10vmin;
         font-weight: normal;
     }
     
     ul {
         list-style: none;
-        font-size: 2.5vmin;
         font-style: italic;
         text-align: initial;
         
+        /* Diamonds */
         li::before { 
-            /* Diamonds */
             content: "\2666";
             display: inline-block;
             margin-left: 1rem;

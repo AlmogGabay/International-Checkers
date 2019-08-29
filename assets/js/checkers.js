@@ -1,7 +1,4 @@
 "use strict";
-/**********************/
-/*VARIABLE DEFINITIONS*/
-/**********************/
 var __read = (this && this.__read) || function (o, n) {
     var m = typeof Symbol === "function" && o[Symbol.iterator];
     if (!m) return o;
@@ -47,9 +44,6 @@ var whitePawns;
 var blackPawns;
 var lastSelected;
 var paths = [];
-/**********************/
-/*FUNCTION DEFINITIONS*/
-/**********************/
 var gameStart = function () {
     turn = 'white-pawn';
     whitePawns = 12;
@@ -57,10 +51,9 @@ var gameStart = function () {
     lastSelected = null;
     knights[0].style.opacity = '1';
     knights[1].style.opacity = '0.3';
-    tiles.forEach(function (row) { return row && clearTiles(row); }); // tiles[0] is null
+    tiles.forEach(function (row) { return row && clearTiles(row); });
     fillPawns();
 };
-/* Clears all of the previous pawns */
 var clearTiles = function (tilesRow) {
     tilesRow.forEach(function (tile) {
         tile.classList.remove('pressed-pawn', 'white-pawn', 'black-pawn', 'white-king', 'black-king', 'suggested-move-white-pawn', 'suggested-move-black-pawn', 'intermediate-capture', 'capture');
@@ -69,7 +62,6 @@ var clearTiles = function (tilesRow) {
         delete tile.king;
     });
 };
-/* Places all the pawns in their initial position */
 var fillPawns = function () {
     tiles.forEach(function (row, rowIndex) {
         if (rowIndex >= 1 && rowIndex <= 3) {
@@ -92,25 +84,25 @@ var setPawn = function (pawnColor, tile) {
 var checkChosenPath = function (selectedTile, row, tile) {
     if (selectedTile.classList.contains('suggested-move-' + turn)) {
         if (paths[0].length > 1) {
-            var chosenPath = paths.filter(function (path) { return path.includes(selectedTile); })[0]; // [0] is to prevent a reversed diamond capture
-            performStep(chosenPath);
+            var chosenPath = paths.filter(function (path) { return path.includes(selectedTile); })[0];
+            move(chosenPath);
         }
-        if (turn == 'white-pawn') { // white turn
-            if (lastSelected.king || row == 8) { // if the previously selected pawn is a king or is about to become one
-                delete lastSelected.king; // since selectedTile and lastSelected might be the same (diamond capture scenario), this line has to be here and not outside the big 'if' statement
+        if (turn == 'white-pawn') {
+            if (lastSelected.king || row == 8) {
+                delete lastSelected.king;
                 selectedTile.classList.add('white-king');
                 selectedTile.king = true;
             }
             else {
                 selectedTile.classList.add('white-pawn');
             }
-            if (selectedTile != lastSelected) { // this makes sure that a pawn does not disappear after performing a diamond capture
+            if (selectedTile != lastSelected) {
                 lastSelected.classList.remove('white-pawn', 'white-king');
                 delete lastSelected.whitePawn;
             }
             selectedTile.whitePawn = true;
         }
-        else { // black turn
+        else {
             if (lastSelected.king || row == 1) {
                 delete lastSelected.king;
                 selectedTile.classList.add('black-king');
@@ -134,9 +126,9 @@ var checkChosenPath = function (selectedTile, row, tile) {
         selectedTile.classList.add('pressed-pawn');
         handlePaths(selectedTile, row, tile);
     }
-    lastSelected = selectedTile; // 'remembers' the last tile that was selected, this allows a capturer to move to its new position
+    lastSelected = selectedTile;
 };
-var performStep = function (chosenPath) {
+var move = function (chosenPath) {
     turn == 'white-pawn' ? blackPawns -= chosenPath.length / 2 : whitePawns -= chosenPath.length / 2;
     clearPaths(chosenPath);
 };
@@ -158,12 +150,12 @@ var clearPaths = function (chosenPath, lastSelected) {
     }
 };
 var handlePaths = function (selectedTile, row, tile) {
-    if (turn == 'white-pawn') { // white turn
+    if (turn == 'white-pawn') {
         (row % 2 == 0) ?
             paths = findPaths(row, tile, 1, 1, 1, 'whitePawn', 'blackPawn', selectedTile) :
             paths = findPaths(row, tile, 1, -1, -1, 'whitePawn', 'blackPawn', selectedTile);
     }
-    else { // black turn
+    else {
         (row % 2 == 0) ?
             paths = findPaths(row, tile, -1, 1, 1, 'blackPawn', 'whitePawn', selectedTile) :
             paths = findPaths(row, tile, -1, -1, -1, 'blackPawn', 'whitePawn', selectedTile);
@@ -180,24 +172,20 @@ var handlePaths = function (selectedTile, row, tile) {
         }
     }); });
 };
-/* A recursive backtracking function that finds all of the possible paths */
 var findPaths = function (row, tile, rStep, tStep, doubleTileStep, friend, foe, originalPawn, captureOccured, path) {
     if (captureOccured === void 0) { captureOccured = false; }
     if (path === void 0) { path = []; }
     var pathsArr = [];
     tiles[row][tile].stepped = true;
-    /* FORWARD MOVEMENT */
-    if (tiles[row + rStep] && tiles[row + rStep][tile + tStep] && !tiles[row + rStep][tile + tStep][friend]) { // if not friend
-        if (!tiles[row + rStep][tile + tStep][foe]) { // if empty
-            if (!captureOccured) { // a step without a capture
+    if (tiles[row + rStep] && tiles[row + rStep][tile + tStep] && !tiles[row + rStep][tile + tStep][friend]) {
+        if (!tiles[row + rStep][tile + tStep][foe]) {
+            if (!captureOccured) {
                 pathsArr.push(__spread(path, [tiles[row + rStep][tile + tStep]]));
             }
         }
-        else if (tiles[row + rStep * 2] && tiles[row + rStep * 2][tile + doubleTileStep]) { // if jump tile exists
-            if ( // if jump tile is empty AND hasn't been stepped on OR if jump tile is the pressed pawn AND at least 5 tiles have been passed through 
-            (!tiles[row + rStep * 2][tile + doubleTileStep][friend] && !tiles[row + rStep * 2][tile + doubleTileStep][foe] && !tiles[row + rStep * 2][tile + doubleTileStep].stepped)
-                || (tiles[row + rStep * 2][tile + doubleTileStep] == originalPawn && path.length > 5 && path.length < 10) // less than 10 prevents the reversed diamond issue
-            ) {
+        else if (tiles[row + rStep * 2] && tiles[row + rStep * 2][tile + doubleTileStep]) {
+            if ((!tiles[row + rStep * 2][tile + doubleTileStep][friend] && !tiles[row + rStep * 2][tile + doubleTileStep][foe] && !tiles[row + rStep * 2][tile + doubleTileStep].stepped)
+                || (tiles[row + rStep * 2][tile + doubleTileStep] == originalPawn && path.length > 5 && path.length < 10)) {
                 pathsArr.push.apply(pathsArr, __spread(findPaths(row + rStep * 2, tile + doubleTileStep, rStep, tStep, doubleTileStep, friend, foe, originalPawn, true, __spread(path, [tiles[row + rStep][tile + tStep], tiles[row + rStep * 2][tile + doubleTileStep]]))));
             }
         }
@@ -215,7 +203,6 @@ var findPaths = function (row, tile, rStep, tStep, doubleTileStep, friend, foe, 
             }
         }
     }
-    /* BACKWARD MOVEMENT */
     if (tiles[row - rStep] && tiles[row - rStep][tile + tStep] && !tiles[row - rStep][tile + tStep][friend]) {
         if (tiles[row - rStep][tile + tStep][foe]) {
             if (tiles[row - rStep * 2] && tiles[row - rStep * 2][tile + doubleTileStep]) {
@@ -226,7 +213,7 @@ var findPaths = function (row, tile, rStep, tStep, doubleTileStep, friend, foe, 
             }
         }
         else if (originalPawn.king && !captureOccured) {
-            pathsArr.push(__spread(path, [tiles[row - rStep][tile + tStep]])); // only a king is allowed to move backwards without a capture
+            pathsArr.push(__spread(path, [tiles[row - rStep][tile + tStep]]));
         }
     }
     if (tiles[row - rStep] && tiles[row - rStep][tile] && !tiles[row - rStep][tile][friend]) {
@@ -268,9 +255,6 @@ var checkGameOver = function () {
     }
     return false;
 };
-/*****************/
-/*EVENT LISTENERS*/
-/*****************/
 window.addEventListener('DOMContentLoaded', function () {
     var loading = qS('#loading');
     setTimeout(function () { return loading.style.opacity = '0'; }, 500);
@@ -282,7 +266,7 @@ knights.forEach(function (knight) { return knight.addEventListener('click', func
     }
 }); });
 playButton.addEventListener('click', function () {
-    cover.addEventListener('transitionend', function () { return coverContainer.style.display = 'none'; }); // prevents the 'no cover on first launch' issue
+    cover.addEventListener('transitionend', function () { return coverContainer.style.display = 'none'; });
     playButton.style.display = 'none';
     rules.style.display = 'none';
     cover.style.backgroundColor = 'rgba(255, 255, 255, 0)';
