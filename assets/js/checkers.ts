@@ -5,7 +5,7 @@
 const qS = (selector: string): HTMLElement => document.querySelector(selector);
 const qSA = (selector: string): NodeListOf<HTMLElement> => document.querySelectorAll(selector);
 
-interface TileElement extends HTMLElement {
+type TileElement = HTMLElement & {
     whitePawn?: boolean,
     blackPawn?: boolean,
     king?: boolean,
@@ -295,7 +295,7 @@ const switchTurns = (): void => {
 const checkGameOver = (): boolean => {
     if (whitePawns == 0 || blackPawns == 0) {
         coverContainer.style.display = 'flex';
-        cover.style.backgroundColor = 'rgba(255, 255, 255, 0.4)';
+        cover.style.backgroundColor = 'rgba(255, 255, 255, 0.5)';
         board.style.filter = 'blur(8px)';
         newGameButton.style.display = 'inline-block';
         return true;

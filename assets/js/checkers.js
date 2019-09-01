@@ -248,7 +248,7 @@ var switchTurns = function () {
 var checkGameOver = function () {
     if (whitePawns == 0 || blackPawns == 0) {
         coverContainer.style.display = 'flex';
-        cover.style.backgroundColor = 'rgba(255, 255, 255, 0.4)';
+        cover.style.backgroundColor = 'rgba(255, 255, 255, 0.5)';
         board.style.filter = 'blur(8px)';
         newGameButton.style.display = 'inline-block';
         return true;
