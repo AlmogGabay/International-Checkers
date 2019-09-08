@@ -28,6 +28,29 @@ body {
   opacity: 0.1;
 }
 
+.fullscreen-icon {
+  position: fixed;
+  z-index: 2;
+  width: 2vw;
+  opacity: 0.2;
+  -webkit-transition: opacity 0.2s;
+  transition: opacity 0.2s;
+}
+
+.fullscreen-icon:hover {
+  opacity: 1;
+}
+
+.fullscreen-icon#top-left {
+  top: 1%;
+  left: 1%;
+}
+
+.fullscreen-icon#bottom-right {
+  bottom: 1%;
+  right: 1%;
+}
+
 #flex-container, #cover-flex-container {
   display: -webkit-box;
   display: -ms-flexbox;
@@ -120,6 +143,8 @@ body {
   -webkit-box-shadow: 0.1rem 0.1rem 2px gray;
           box-shadow: 0.1rem 0.1rem 2px gray;
   cursor: pointer;
+  -webkit-transition: background-color 0.1s;
+  transition: background-color 0.1s;
 }
 
 #play-button:hover, #newgame-button:hover {
@@ -313,6 +338,9 @@ body {
 
 /* Mobile */
 @media (max-width: 450px) {
+  .fullscreen-icon {
+    width: 6vw;
+  }
   .knight {
     max-width: 20vmin;
     max-height: 20vmin;

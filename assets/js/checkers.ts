@@ -2,9 +2,6 @@
  /*VARIABLE DEFINITIONS*/
 /**********************/
 
-const qS = (selector: string): HTMLElement => document.querySelector(selector);
-const qSA = (selector: string): NodeListOf<HTMLElement> => document.querySelectorAll(selector);
-
 type TileElement = HTMLElement & {
     whitePawn?: boolean,
     blackPawn?: boolean,
@@ -12,23 +9,24 @@ type TileElement = HTMLElement & {
     stepped?: boolean
 }
 
-const coverContainer: HTMLDivElement = qS('#cover-flex-container') as HTMLDivElement;
-const cover: HTMLDivElement = qS('#cover') as HTMLDivElement;
-const rules: HTMLDivElement = qS('#rules') as HTMLDivElement;
-const playButton: HTMLDivElement = qS('#play-button') as HTMLDivElement;
-const newGameButton: HTMLDivElement = qS('#newgame-button') as HTMLDivElement;
-const board: HTMLDivElement = qS('#board') as HTMLDivElement;
-const knights: NodeListOf<HTMLImageElement> = qSA('.knight') as NodeListOf<HTMLImageElement>;
+const fullscreenIcons: NodeListOf<HTMLImageElement> = document.querySelectorAll('.fullscreen-icon');
+const coverContainer: HTMLDivElement = document.querySelector('#cover-flex-container');
+const cover: HTMLDivElement = document.querySelector('#cover');
+const rules: HTMLDivElement = document.querySelector('#rules');
+const playButton: HTMLDivElement = document.querySelector('#play-button');
+const newGameButton: HTMLDivElement = document.querySelector('#newgame-button');
+const board: HTMLDivElement = document.querySelector('#board');
+const knights: NodeListOf<HTMLImageElement> = document.querySelectorAll('.knight');
 const tiles: NodeListOf<TileElement>[] = [
     null, 
-    qSA('.first'), 
-    qSA('.second'), 
-    qSA('.third'), 
-    qSA('.fourth'), 
-    qSA('.fifth'), 
-    qSA('.sixth'), 
-    qSA('.seventh'), 
-    qSA('.eighth')
+    document.querySelectorAll('.first'), 
+    document.querySelectorAll('.second'), 
+    document.querySelectorAll('.third'), 
+    document.querySelectorAll('.fourth'), 
+    document.querySelectorAll('.fifth'), 
+    document.querySelectorAll('.sixth'), 
+    document.querySelectorAll('.seventh'), 
+    document.querySelectorAll('.eighth')
 ];
     
 let turn: 'white-pawn' | 'black-pawn';
@@ -309,10 +307,20 @@ const checkGameOver = (): boolean => {
 /*****************/
 
 window.addEventListener('DOMContentLoaded', () => { 
-    const loading: HTMLDivElement = qS('#loading') as HTMLDivElement;
+    const loading: HTMLDivElement = document.querySelector('#loading');
     setTimeout(() => loading.style.opacity = '0', 500);
     loading.addEventListener('transitionend', () => document.body.removeChild(loading));
 });
+
+fullscreenIcons.forEach((icon: HTMLImageElement) => icon.addEventListener('click', 
+    () => {
+        if (document.fullscreen) {
+            document.exitFullscreen();
+        } else {
+            document.documentElement.requestFullscreen();
+        }
+    })
+);
 
 knights.forEach((knight: HTMLImageElement) => knight.addEventListener('click', 
     () => {

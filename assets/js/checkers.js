@@ -19,25 +19,24 @@ var __spread = (this && this.__spread) || function () {
     for (var ar = [], i = 0; i < arguments.length; i++) ar = ar.concat(__read(arguments[i]));
     return ar;
 };
-var qS = function (selector) { return document.querySelector(selector); };
-var qSA = function (selector) { return document.querySelectorAll(selector); };
-var coverContainer = qS('#cover-flex-container');
-var cover = qS('#cover');
-var rules = qS('#rules');
-var playButton = qS('#play-button');
-var newGameButton = qS('#newgame-button');
-var board = qS('#board');
-var knights = qSA('.knight');
+var fullscreenIcons = document.querySelectorAll('.fullscreen-icon');
+var coverContainer = document.querySelector('#cover-flex-container');
+var cover = document.querySelector('#cover');
+var rules = document.querySelector('#rules');
+var playButton = document.querySelector('#play-button');
+var newGameButton = document.querySelector('#newgame-button');
+var board = document.querySelector('#board');
+var knights = document.querySelectorAll('.knight');
 var tiles = [
     null,
-    qSA('.first'),
-    qSA('.second'),
-    qSA('.third'),
-    qSA('.fourth'),
-    qSA('.fifth'),
-    qSA('.sixth'),
-    qSA('.seventh'),
-    qSA('.eighth')
+    document.querySelectorAll('.first'),
+    document.querySelectorAll('.second'),
+    document.querySelectorAll('.third'),
+    document.querySelectorAll('.fourth'),
+    document.querySelectorAll('.fifth'),
+    document.querySelectorAll('.sixth'),
+    document.querySelectorAll('.seventh'),
+    document.querySelectorAll('.eighth')
 ];
 var turn;
 var whitePawns;
@@ -256,10 +255,18 @@ var checkGameOver = function () {
     return false;
 };
 window.addEventListener('DOMContentLoaded', function () {
-    var loading = qS('#loading');
+    var loading = document.querySelector('#loading');
     setTimeout(function () { return loading.style.opacity = '0'; }, 500);
     loading.addEventListener('transitionend', function () { return document.body.removeChild(loading); });
 });
+fullscreenIcons.forEach(function (icon) { return icon.addEventListener('click', function () {
+    if (document.fullscreen) {
+        document.exitFullscreen();
+    }
+    else {
+        document.documentElement.requestFullscreen();
+    }
+}); });
 knights.forEach(function (knight) { return knight.addEventListener('click', function () {
     if (confirm('Restart the game?')) {
         gameStart();
