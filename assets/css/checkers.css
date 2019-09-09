@@ -143,8 +143,6 @@ body {
   -webkit-box-shadow: 0.1rem 0.1rem 2px gray;
           box-shadow: 0.1rem 0.1rem 2px gray;
   cursor: pointer;
-  -webkit-transition: background-color 0.1s;
-  transition: background-color 0.1s;
 }
 
 #play-button:hover, #newgame-button:hover {
