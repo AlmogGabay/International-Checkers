@@ -1,5 +1,5 @@
 # Checkers
-A PvP international draughts game built with HTML, SCSS and TypeScript.
+A PvP international draughts game built with HTML, SASS and TypeScript.
 
 Play it on: https://theninthsky.github.io/checkers/
 
