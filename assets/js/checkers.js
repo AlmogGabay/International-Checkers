@@ -254,11 +254,6 @@ var checkGameOver = function () {
     }
     return false;
 };
-window.addEventListener('DOMContentLoaded', function () {
-    var loading = document.querySelector('#loading');
-    setTimeout(function () { return loading.style.opacity = '0'; }, 500);
-    loading.addEventListener('transitionend', function () { return document.body.removeChild(loading); });
-});
 fullscreenIcons.forEach(function (icon) { return icon.addEventListener('click', function () {
     if (document.fullscreen) {
         document.exitFullscreen();
