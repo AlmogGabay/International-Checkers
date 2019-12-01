@@ -4,8 +4,8 @@ body {
      -moz-user-select: none;
       -ms-user-select: none;
           user-select: none;
-  -webkit-animation: show 1s;
-          animation: show 1s;
+  -webkit-animation: show 2s;
+          animation: show 2s;
 }
 
 @-webkit-keyframes show {
