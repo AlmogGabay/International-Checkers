@@ -19,24 +19,26 @@ var __spread = (this && this.__spread) || function () {
     for (var ar = [], i = 0; i < arguments.length; i++) ar = ar.concat(__read(arguments[i]));
     return ar;
 };
-var fullscreenIcons = document.querySelectorAll('.fullscreen-icon');
-var coverContainer = document.querySelector('#cover-flex-container');
-var cover = document.querySelector('#cover');
-var rules = document.querySelector('#rules');
-var playButton = document.querySelector('#play-button');
-var newGameButton = document.querySelector('#newgame-button');
-var board = document.querySelector('#board');
-var knights = document.querySelectorAll('.knight');
+var qS = document.querySelector.bind(document);
+var qSA = document.querySelectorAll.bind(document);
+var fullscreenIcons = qSA('.fullscreen-icon');
+var coverContainer = qS('#cover-flex-container');
+var cover = qS('#cover');
+var rules = qS('#rules');
+var playButton = qS('#play-button');
+var newGameButton = qS('#newgame-button');
+var board = qS('#board');
+var knights = qSA('.knight');
 var tiles = [
     null,
-    document.querySelectorAll('.first'),
-    document.querySelectorAll('.second'),
-    document.querySelectorAll('.third'),
-    document.querySelectorAll('.fourth'),
-    document.querySelectorAll('.fifth'),
-    document.querySelectorAll('.sixth'),
-    document.querySelectorAll('.seventh'),
-    document.querySelectorAll('.eighth')
+    qSA('.first'),
+    qSA('.second'),
+    qSA('.third'),
+    qSA('.fourth'),
+    qSA('.fifth'),
+    qSA('.sixth'),
+    qSA('.seventh'),
+    qSA('.eighth')
 ];
 var turn;
 var whitePawns;
@@ -116,9 +118,8 @@ var checkChosenPath = function (selectedTile, row, tile) {
             }
             selectedTile.blackPawn = true;
         }
-        if (!checkGameOver()) {
+        if (!checkGameOver())
             switchTurns();
-        }
     }
     clearPaths(null, lastSelected);
     if (selectedTile[turn == 'white-pawn' ? 'whitePawn' : 'blackPawn'] && !checkGameOver()) {
@@ -255,17 +256,13 @@ var checkGameOver = function () {
     return false;
 };
 fullscreenIcons.forEach(function (icon) { return icon.addEventListener('click', function () {
-    if (document.fullscreen) {
-        document.exitFullscreen();
-    }
-    else {
+    document.fullscreen ?
+        document.exitFullscreen() :
         document.documentElement.requestFullscreen();
-    }
 }); });
 knights.forEach(function (knight) { return knight.addEventListener('click', function () {
-    if (confirm('Restart the game?')) {
+    if (confirm('Restart the game?'))
         gameStart();
-    }
 }); });
 playButton.addEventListener('click', function () {
     cover.addEventListener('transitionend', function () { return coverContainer.style.display = 'none'; });
