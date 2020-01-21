@@ -82,7 +82,6 @@ var setPawn = function (pawnColor, tile) {
     tile[pawnColor == 'white-pawn' ? 'whitePawn' : 'blackPawn'] = true;
 };
 var checkChosenPath = function (selectedTile, row, tile) {
-    console.log('checkChosenPath');
     if (selectedTile.classList.contains("suggested-move-" + turn)) {
         if (paths[0].length > 1) {
             var chosenPath = paths.filter(function (path) { return path.includes(selectedTile); })[0];

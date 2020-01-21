@@ -92,7 +92,6 @@ const setPawn = (pawnColor: 'white-pawn' | 'black-pawn', tile: TileElement): voi
 }
 
 const checkChosenPath = (selectedTile: TileElement, row: number, tile: number): void => {
-    console.log('checkChosenPath')
     if (selectedTile.classList.contains(`suggested-move-${turn}`)) {
         if (paths[0].length > 1) {
             const chosenPath: TileElement[] = paths.filter((path: TileElement[]) => path.includes(selectedTile))[0] // [0] is to prevent a 'reversed diamond' capture
