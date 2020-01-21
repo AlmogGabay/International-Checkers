@@ -1,6 +1,4 @@
-  /**********************/
- /*VARIABLE DEFINITIONS*/
-/**********************/
+/* -VARIABLE DEFINITIONS- */
 
 type TileElement = HTMLElement & {
     whitePawn?: boolean,
@@ -22,16 +20,13 @@ const board: HTMLDivElement = qS('#board')
 const knights: NodeListOf<HTMLImageElement> = qSA('.knight')
 const tiles: NodeListOf<TileElement>[] = [
     null,
-    qSA('.first'),
-    qSA('.second'),
-    qSA('.third'),
-    qSA('.fourth'),
-    qSA('.fifth'),
-    qSA('.sixth'),
-    qSA('.seventh'),
-    qSA('.eighth')
+    qSA('.first'), qSA('.second'),
+    qSA('.third'), qSA('.fourth'),
+    qSA('.fifth'), qSA('.sixth'),
+    qSA('.seventh'), qSA('.eighth')
 ]
 
+let firstGame: boolean = true
 let turn: 'white-pawn' | 'black-pawn'
 let whitePawns: number
 let blackPawns: number
@@ -39,9 +34,7 @@ let lastSelected: TileElement
 let paths: TileElement[][] = []
 
 
-  /**********************/
- /*FUNCTION DEFINITIONS*/
-/**********************/
+/* -FUNCTION DEFINITIONS- */
 
 const gameStart = (): void => {
     turn = 'white-pawn'
@@ -83,11 +76,14 @@ const fillPawns = (): void => {
             row.forEach((tile: TileElement) => setPawn('black-pawn', tile))
         }
     })
-    tiles.forEach((row: NodeListOf<TileElement>, rowIndex: number) =>
-        row && row.forEach((tile: TileElement, tileIndex: number) =>
-            tile.addEventListener('click', () => checkChosenPath(tile, rowIndex, tileIndex))
+
+    if (firstGame) { // this ensures that the event listeners are set only once
+        tiles.forEach((row: NodeListOf<TileElement>, rowIndex: number) =>
+            row && row.forEach((tile: TileElement, tileIndex: number) =>
+                tile.addEventListener('click', () => checkChosenPath(tile, rowIndex, tileIndex))
+            )
         )
-    )
+    }
 }
 
 const setPawn = (pawnColor: 'white-pawn' | 'black-pawn', tile: TileElement): void => {
@@ -96,11 +92,13 @@ const setPawn = (pawnColor: 'white-pawn' | 'black-pawn', tile: TileElement): voi
 }
 
 const checkChosenPath = (selectedTile: TileElement, row: number, tile: number): void => {
-    if (selectedTile.classList.contains('suggested-move-' + turn)) {
+    console.log('checkChosenPath')
+    if (selectedTile.classList.contains(`suggested-move-${turn}`)) {
         if (paths[0].length > 1) {
             const chosenPath: TileElement[] = paths.filter((path: TileElement[]) => path.includes(selectedTile))[0] // [0] is to prevent a 'reversed diamond' capture
             move(chosenPath)
         }
+
         if (turn == 'white-pawn') { // white turn
             if (lastSelected.king || row == 8) { // if the previously selected pawn is a king or is about to become one
                 delete lastSelected.king
@@ -128,8 +126,10 @@ const checkChosenPath = (selectedTile: TileElement, row: number, tile: number): 
             }
             selectedTile.blackPawn = true
         }
+
         if (!checkGameOver()) switchTurns()
     }
+
     clearPaths(null, lastSelected)
     if (selectedTile[turn == 'white-pawn' ? 'whitePawn' : 'blackPawn'] && !checkGameOver()) {
         selectedTile.classList.add('pressed-pawn')
@@ -152,6 +152,7 @@ const clearPaths = (chosenPath: TileElement[], lastSelected?: TileElement): void
             'suggested-move-black-pawn',
         )
     }))
+
     if (chosenPath) {
         chosenPath.forEach((tile: TileElement) => {
             tile.classList.remove(
@@ -165,6 +166,7 @@ const clearPaths = (chosenPath: TileElement[], lastSelected?: TileElement): void
             delete tile.king
         })
     }
+
     paths = []
     if (lastSelected) {
         lastSelected.classList.remove('pressed-pawn')
@@ -184,7 +186,7 @@ const handlePaths = (selectedTile: TileElement, row: number, tile: number): void
 
     paths.forEach((path: TileElement[]) => path.forEach((tile, ind) => {
         if (ind == path.length - 1) {
-            tile.classList.add('suggested-move-' + turn)
+            tile.classList.add(`suggested-move-${turn}`)
         }
         else if (ind % 2 == 0) {
             tile.classList.add('capture')
@@ -203,7 +205,7 @@ const findPaths = (
     doubleTileStep: number,
     friend: 'whitePawn' | 'blackPawn',
     foe: 'whitePawn' | 'blackPawn',
-    originalPawn: TileElement,
+    originalTile: TileElement,
     captureOccured: boolean = false,
     path: TileElement[] = []
 ): TileElement[][] => {
@@ -220,9 +222,20 @@ const findPaths = (
         } else if (tiles[row + rStep * 2] && tiles[row + rStep * 2][tile + doubleTileStep]) { // if jump tile exists
             if ( // if jump tile is empty AND hasn't been stepped on OR if jump tile is the pressed pawn AND at least 5 tiles have been passed through 
                 (!tiles[row + rStep * 2][tile + doubleTileStep][friend] && !tiles[row + rStep * 2][tile + doubleTileStep][foe] && !tiles[row + rStep * 2][tile + doubleTileStep].stepped)
-                || (tiles[row + rStep * 2][tile + doubleTileStep] == originalPawn && path.length > 5 && path.length < 10) // less than 10 prevents the reversed diamond issue
+                || (tiles[row + rStep * 2][tile + doubleTileStep] == originalTile && path.length > 5 && path.length < 10) // less than 10 prevents the reversed diamond issue
             ) {
-                pathsArr.push(...findPaths(row + rStep * 2, tile + doubleTileStep, rStep, tStep, doubleTileStep, friend, foe, originalPawn, true, [...path, tiles[row + rStep][tile + tStep], tiles[row + rStep * 2][tile + doubleTileStep]]))
+                pathsArr.push(...findPaths(
+                    row + rStep * 2,
+                    tile + doubleTileStep,
+                    rStep,
+                    tStep,
+                    doubleTileStep,
+                    friend,
+                    foe,
+                    originalTile,
+                    true,
+                    [...path, tiles[row + rStep][tile + tStep], tiles[row + rStep * 2][tile + doubleTileStep]]
+                ))
             }
         }
     }
@@ -235,9 +248,20 @@ const findPaths = (
         } else if (tiles[row + rStep * 2] && tiles[row + rStep * 2][tile - doubleTileStep]) {
             if (
                 (!tiles[row + rStep * 2][tile - doubleTileStep][friend] && !tiles[row + rStep * 2][tile - doubleTileStep][foe] && !tiles[row + rStep * 2][tile - doubleTileStep].stepped)
-                || (tiles[row + rStep * 2][tile - doubleTileStep] == originalPawn && path.length > 5 && path.length < 10)
+                || (tiles[row + rStep * 2][tile - doubleTileStep] == originalTile && path.length > 5 && path.length < 10)
             ) {
-                pathsArr.push(...findPaths(row + rStep * 2, tile - doubleTileStep, rStep, tStep, doubleTileStep, friend, foe, originalPawn, true, [...path, tiles[row + rStep][tile], tiles[row + rStep * 2][tile - doubleTileStep]]))
+                pathsArr.push(...findPaths(
+                    row + rStep * 2,
+                    tile - doubleTileStep,
+                    rStep,
+                    tStep,
+                    doubleTileStep,
+                    friend,
+                    foe,
+                    originalTile,
+                    true,
+                    [...path, tiles[row + rStep][tile], tiles[row + rStep * 2][tile - doubleTileStep]]
+                ))
             }
         }
     }
@@ -248,12 +272,23 @@ const findPaths = (
             if (tiles[row - rStep * 2] && tiles[row - rStep * 2][tile + doubleTileStep]) {
                 if (
                     (!tiles[row - rStep * 2][tile + doubleTileStep][friend] && !tiles[row - rStep * 2][tile + doubleTileStep][foe] && !tiles[row - rStep * 2][tile + doubleTileStep].stepped)
-                    || (tiles[row - rStep * 2][tile + doubleTileStep] == originalPawn && path.length > 5 && path.length < 10)
+                    || (tiles[row - rStep * 2][tile + doubleTileStep] == originalTile && path.length > 5 && path.length < 10)
                 ) {
-                    pathsArr.push(...findPaths(row - rStep * 2, tile + doubleTileStep, rStep, tStep, doubleTileStep, friend, foe, originalPawn, true, [...path, tiles[row - rStep][tile + tStep], tiles[row - rStep * 2][tile + doubleTileStep]]))
+                    pathsArr.push(...findPaths(
+                        row - rStep * 2,
+                        tile + doubleTileStep,
+                        rStep,
+                        tStep,
+                        doubleTileStep,
+                        friend,
+                        foe,
+                        originalTile,
+                        true,
+                        [...path, tiles[row - rStep][tile + tStep], tiles[row - rStep * 2][tile + doubleTileStep]]
+                    ))
                 }
             }
-        } else if (originalPawn.king && !captureOccured) { // only a king is allowed to move backwards without a capture
+        } else if (originalTile.king && !captureOccured) { // only a king is allowed to move backwards without a capture
             pathsArr.push([...path, tiles[row - rStep][tile + tStep]])
         }
     }
@@ -263,12 +298,23 @@ const findPaths = (
             if (tiles[row - rStep * 2] && tiles[row - rStep * 2][tile - doubleTileStep]) {
                 if (
                     (!tiles[row - rStep * 2][tile - doubleTileStep][friend] && !tiles[row - rStep * 2][tile - doubleTileStep][foe] && !tiles[row - rStep * 2][tile - doubleTileStep].stepped)
-                    || (tiles[row - rStep * 2][tile - doubleTileStep] == originalPawn && path.length > 5 && path.length < 10)
+                    || (tiles[row - rStep * 2][tile - doubleTileStep] == originalTile && path.length > 5 && path.length < 10)
                 ) {
-                    pathsArr.push(...findPaths(row - rStep * 2, tile - doubleTileStep, rStep, tStep, doubleTileStep, friend, foe, originalPawn, true, [...path, tiles[row - rStep][tile], tiles[row - rStep * 2][tile - doubleTileStep]]))
+                    pathsArr.push(...findPaths(
+                        row - rStep * 2,
+                        tile - doubleTileStep,
+                        rStep,
+                        tStep,
+                        doubleTileStep,
+                        friend,
+                        foe,
+                        originalTile,
+                        true,
+                        [...path, tiles[row - rStep][tile], tiles[row - rStep * 2][tile - doubleTileStep]]
+                    ))
                 }
             }
-        } else if (originalPawn.king && !captureOccured) {
+        } else if (originalTile.king && !captureOccured) {
             pathsArr.push([...path, tiles[row - rStep][tile]])
         }
     }
@@ -276,7 +322,8 @@ const findPaths = (
     delete tiles[row][tile].stepped
 
     return pathsArr.length > 0 ?
-        pathsArr.sort((a, b) => b.length - a.length).filter(path => path.length == pathsArr[0].length) : [[...path]]
+        pathsArr.sort((a, b) => b.length - a.length).filter(path => path.length == pathsArr[0].length) :
+        [[...path]]
 }
 
 const switchTurns = (): void => {
@@ -297,15 +344,15 @@ const checkGameOver = (): boolean => {
         cover.style.backgroundColor = 'rgba(255, 255, 255, 0.5)'
         board.style.filter = 'blur(8px)'
         newGameButton.style.display = 'inline-block'
+        firstGame = false
+
         return true
     }
     return false
 }
 
 
-  /*****************/
- /*EVENT LISTENERS*/
-/*****************/
+/* -EVENT LISTENERS- */
 
 fullscreenIcons.forEach((icon: HTMLImageElement) => icon.addEventListener('click',
     () => {
@@ -317,7 +364,10 @@ fullscreenIcons.forEach((icon: HTMLImageElement) => icon.addEventListener('click
 
 knights.forEach((knight: HTMLImageElement) => knight.addEventListener('click',
     () => {
-        if (confirm('Restart the game?')) gameStart()
+        if (confirm('Restart the game?')) {
+            firstGame = false
+            gameStart()
+        }
     })
 )
 
