@@ -31,10 +31,14 @@ var board = qS('#board');
 var knights = qSA('.knight');
 var tiles = [
     null,
-    qSA('.first'), qSA('.second'),
-    qSA('.third'), qSA('.fourth'),
-    qSA('.fifth'), qSA('.sixth'),
-    qSA('.seventh'), qSA('.eighth')
+    qSA('.first'),
+    qSA('.second'),
+    qSA('.third'),
+    qSA('.fourth'),
+    qSA('.fifth'),
+    qSA('.sixth'),
+    qSA('.seventh'),
+    qSA('.eighth')
 ];
 var firstGame = true;
 var turn;
@@ -71,9 +75,12 @@ var fillPawns = function () {
     });
     if (firstGame) {
         tiles.forEach(function (row, rowIndex) {
-            return row && row.forEach(function (tile, tileIndex) {
-                return tile.addEventListener('click', function () { return checkChosenPath(tile, rowIndex, tileIndex); });
-            });
+            return row &&
+                row.forEach(function (tile, tileIndex) {
+                    return tile.addEventListener('click', function () {
+                        return checkChosenPath(tile, rowIndex, tileIndex);
+                    });
+                });
         });
     }
 };
@@ -84,7 +91,9 @@ var setPawn = function (pawnColor, tile) {
 var checkChosenPath = function (selectedTile, row, tile) {
     if (selectedTile.classList.contains("suggested-move-" + turn)) {
         if (paths[0].length > 1) {
-            var chosenPath = paths.filter(function (path) { return path.includes(selectedTile); })[0];
+            var chosenPath = paths.filter(function (path) {
+                return path.includes(selectedTile);
+            })[0];
             move(chosenPath);
         }
         if (turn == 'white-pawn') {
@@ -121,20 +130,25 @@ var checkChosenPath = function (selectedTile, row, tile) {
             switchTurns();
     }
     clearPaths(null, lastSelected);
-    if (selectedTile[turn == 'white-pawn' ? 'whitePawn' : 'blackPawn'] && !checkGameOver()) {
+    if (selectedTile[turn == 'white-pawn' ? 'whitePawn' : 'blackPawn'] &&
+        !checkGameOver()) {
         selectedTile.classList.add('pressed-pawn');
         handlePaths(selectedTile, row, tile);
     }
     lastSelected = selectedTile;
 };
 var move = function (chosenPath) {
-    turn == 'white-pawn' ? blackPawns -= chosenPath.length / 2 : whitePawns -= chosenPath.length / 2;
+    turn == 'white-pawn'
+        ? (blackPawns -= chosenPath.length / 2)
+        : (whitePawns -= chosenPath.length / 2);
     clearPaths(chosenPath);
 };
 var clearPaths = function (chosenPath, lastSelected) {
-    paths.forEach(function (path) { return path.forEach(function (tile) {
-        tile.classList.remove('intermediate-capture', 'capture', 'suggested-move-white-pawn', 'suggested-move-black-pawn');
-    }); });
+    paths.forEach(function (path) {
+        return path.forEach(function (tile) {
+            tile.classList.remove('intermediate-capture', 'capture', 'suggested-move-white-pawn', 'suggested-move-black-pawn');
+        });
+    });
     if (chosenPath) {
         chosenPath.forEach(function (tile) {
             tile.classList.remove('white-pawn', 'black-pawn', 'white-king', 'black-king');
@@ -150,64 +164,96 @@ var clearPaths = function (chosenPath, lastSelected) {
 };
 var handlePaths = function (selectedTile, row, tile) {
     if (turn == 'white-pawn') {
-        (row % 2 == 0) ?
-            paths = findPaths(row, tile, 1, 1, 1, 'whitePawn', 'blackPawn', selectedTile) :
-            paths = findPaths(row, tile, 1, -1, -1, 'whitePawn', 'blackPawn', selectedTile);
+        row % 2 == 0
+            ? (paths = findPaths(row, tile, 1, 1, 1, 'whitePawn', 'blackPawn', selectedTile))
+            : (paths = findPaths(row, tile, 1, -1, -1, 'whitePawn', 'blackPawn', selectedTile));
     }
     else {
-        (row % 2 == 0) ?
-            paths = findPaths(row, tile, -1, 1, 1, 'blackPawn', 'whitePawn', selectedTile) :
-            paths = findPaths(row, tile, -1, -1, -1, 'blackPawn', 'whitePawn', selectedTile);
+        row % 2 == 0
+            ? (paths = findPaths(row, tile, -1, 1, 1, 'blackPawn', 'whitePawn', selectedTile))
+            : (paths = findPaths(row, tile, -1, -1, -1, 'blackPawn', 'whitePawn', selectedTile));
     }
-    paths.forEach(function (path) { return path.forEach(function (tile, ind) {
-        if (ind == path.length - 1) {
-            tile.classList.add("suggested-move-" + turn);
-        }
-        else if (ind % 2 == 0) {
-            tile.classList.add('capture');
-        }
-        else {
-            tile.classList.add('intermediate-capture');
-        }
-    }); });
+    paths.forEach(function (path) {
+        return path.forEach(function (tile, ind) {
+            if (ind == path.length - 1) {
+                tile.classList.add("suggested-move-" + turn);
+            }
+            else if (ind % 2 == 0) {
+                tile.classList.add('capture');
+            }
+            else {
+                tile.classList.add('intermediate-capture');
+            }
+        });
+    });
 };
 var findPaths = function (row, tile, rStep, tStep, doubleTileStep, friend, foe, originalTile, captureOccured, path) {
     if (captureOccured === void 0) { captureOccured = false; }
     if (path === void 0) { path = []; }
     var pathsArr = [];
     tiles[row][tile].stepped = true;
-    if (tiles[row + rStep] && tiles[row + rStep][tile + tStep] && !tiles[row + rStep][tile + tStep][friend]) {
+    if (tiles[row + rStep] &&
+        tiles[row + rStep][tile + tStep] &&
+        !tiles[row + rStep][tile + tStep][friend]) {
         if (!tiles[row + rStep][tile + tStep][foe]) {
             if (!captureOccured) {
                 pathsArr.push(__spread(path, [tiles[row + rStep][tile + tStep]]));
             }
         }
-        else if (tiles[row + rStep * 2] && tiles[row + rStep * 2][tile + doubleTileStep]) {
-            if ((!tiles[row + rStep * 2][tile + doubleTileStep][friend] && !tiles[row + rStep * 2][tile + doubleTileStep][foe] && !tiles[row + rStep * 2][tile + doubleTileStep].stepped)
-                || (tiles[row + rStep * 2][tile + doubleTileStep] == originalTile && path.length > 5 && path.length < 10)) {
-                pathsArr.push.apply(pathsArr, __spread(findPaths(row + rStep * 2, tile + doubleTileStep, rStep, tStep, doubleTileStep, friend, foe, originalTile, true, __spread(path, [tiles[row + rStep][tile + tStep], tiles[row + rStep * 2][tile + doubleTileStep]]))));
+        else if (tiles[row + rStep * 2] &&
+            tiles[row + rStep * 2][tile + doubleTileStep]) {
+            if ((!tiles[row + rStep * 2][tile + doubleTileStep][friend] &&
+                !tiles[row + rStep * 2][tile + doubleTileStep][foe] &&
+                !tiles[row + rStep * 2][tile + doubleTileStep].stepped) ||
+                (tiles[row + rStep * 2][tile + doubleTileStep] == originalTile &&
+                    path.length > 5 &&
+                    path.length < 10)) {
+                pathsArr.push.apply(pathsArr, __spread(findPaths(row + rStep * 2, tile + doubleTileStep, rStep, tStep, doubleTileStep, friend, foe, originalTile, true, __spread(path, [
+                    tiles[row + rStep][tile + tStep],
+                    tiles[row + rStep * 2][tile + doubleTileStep]
+                ]))));
             }
         }
     }
-    if (tiles[row + rStep] && tiles[row + rStep][tile] && !tiles[row + rStep][tile][friend]) {
+    if (tiles[row + rStep] &&
+        tiles[row + rStep][tile] &&
+        !tiles[row + rStep][tile][friend]) {
         if (!tiles[row + rStep][tile][foe]) {
             if (!captureOccured) {
                 pathsArr.push(__spread(path, [tiles[row + rStep][tile]]));
             }
         }
-        else if (tiles[row + rStep * 2] && tiles[row + rStep * 2][tile - doubleTileStep]) {
-            if ((!tiles[row + rStep * 2][tile - doubleTileStep][friend] && !tiles[row + rStep * 2][tile - doubleTileStep][foe] && !tiles[row + rStep * 2][tile - doubleTileStep].stepped)
-                || (tiles[row + rStep * 2][tile - doubleTileStep] == originalTile && path.length > 5 && path.length < 10)) {
-                pathsArr.push.apply(pathsArr, __spread(findPaths(row + rStep * 2, tile - doubleTileStep, rStep, tStep, doubleTileStep, friend, foe, originalTile, true, __spread(path, [tiles[row + rStep][tile], tiles[row + rStep * 2][tile - doubleTileStep]]))));
+        else if (tiles[row + rStep * 2] &&
+            tiles[row + rStep * 2][tile - doubleTileStep]) {
+            if ((!tiles[row + rStep * 2][tile - doubleTileStep][friend] &&
+                !tiles[row + rStep * 2][tile - doubleTileStep][foe] &&
+                !tiles[row + rStep * 2][tile - doubleTileStep].stepped) ||
+                (tiles[row + rStep * 2][tile - doubleTileStep] == originalTile &&
+                    path.length > 5 &&
+                    path.length < 10)) {
+                pathsArr.push.apply(pathsArr, __spread(findPaths(row + rStep * 2, tile - doubleTileStep, rStep, tStep, doubleTileStep, friend, foe, originalTile, true, __spread(path, [
+                    tiles[row + rStep][tile],
+                    tiles[row + rStep * 2][tile - doubleTileStep]
+                ]))));
             }
         }
     }
-    if (tiles[row - rStep] && tiles[row - rStep][tile + tStep] && !tiles[row - rStep][tile + tStep][friend]) {
+    if (tiles[row - rStep] &&
+        tiles[row - rStep][tile + tStep] &&
+        !tiles[row - rStep][tile + tStep][friend]) {
         if (tiles[row - rStep][tile + tStep][foe]) {
-            if (tiles[row - rStep * 2] && tiles[row - rStep * 2][tile + doubleTileStep]) {
-                if ((!tiles[row - rStep * 2][tile + doubleTileStep][friend] && !tiles[row - rStep * 2][tile + doubleTileStep][foe] && !tiles[row - rStep * 2][tile + doubleTileStep].stepped)
-                    || (tiles[row - rStep * 2][tile + doubleTileStep] == originalTile && path.length > 5 && path.length < 10)) {
-                    pathsArr.push.apply(pathsArr, __spread(findPaths(row - rStep * 2, tile + doubleTileStep, rStep, tStep, doubleTileStep, friend, foe, originalTile, true, __spread(path, [tiles[row - rStep][tile + tStep], tiles[row - rStep * 2][tile + doubleTileStep]]))));
+            if (tiles[row - rStep * 2] &&
+                tiles[row - rStep * 2][tile + doubleTileStep]) {
+                if ((!tiles[row - rStep * 2][tile + doubleTileStep][friend] &&
+                    !tiles[row - rStep * 2][tile + doubleTileStep][foe] &&
+                    !tiles[row - rStep * 2][tile + doubleTileStep].stepped) ||
+                    (tiles[row - rStep * 2][tile + doubleTileStep] == originalTile &&
+                        path.length > 5 &&
+                        path.length < 10)) {
+                    pathsArr.push.apply(pathsArr, __spread(findPaths(row - rStep * 2, tile + doubleTileStep, rStep, tStep, doubleTileStep, friend, foe, originalTile, true, __spread(path, [
+                        tiles[row - rStep][tile + tStep],
+                        tiles[row - rStep * 2][tile + doubleTileStep]
+                    ]))));
                 }
             }
         }
@@ -215,12 +261,22 @@ var findPaths = function (row, tile, rStep, tStep, doubleTileStep, friend, foe, 
             pathsArr.push(__spread(path, [tiles[row - rStep][tile + tStep]]));
         }
     }
-    if (tiles[row - rStep] && tiles[row - rStep][tile] && !tiles[row - rStep][tile][friend]) {
+    if (tiles[row - rStep] &&
+        tiles[row - rStep][tile] &&
+        !tiles[row - rStep][tile][friend]) {
         if (tiles[row - rStep][tile][foe]) {
-            if (tiles[row - rStep * 2] && tiles[row - rStep * 2][tile - doubleTileStep]) {
-                if ((!tiles[row - rStep * 2][tile - doubleTileStep][friend] && !tiles[row - rStep * 2][tile - doubleTileStep][foe] && !tiles[row - rStep * 2][tile - doubleTileStep].stepped)
-                    || (tiles[row - rStep * 2][tile - doubleTileStep] == originalTile && path.length > 5 && path.length < 10)) {
-                    pathsArr.push.apply(pathsArr, __spread(findPaths(row - rStep * 2, tile - doubleTileStep, rStep, tStep, doubleTileStep, friend, foe, originalTile, true, __spread(path, [tiles[row - rStep][tile], tiles[row - rStep * 2][tile - doubleTileStep]]))));
+            if (tiles[row - rStep * 2] &&
+                tiles[row - rStep * 2][tile - doubleTileStep]) {
+                if ((!tiles[row - rStep * 2][tile - doubleTileStep][friend] &&
+                    !tiles[row - rStep * 2][tile - doubleTileStep][foe] &&
+                    !tiles[row - rStep * 2][tile - doubleTileStep].stepped) ||
+                    (tiles[row - rStep * 2][tile - doubleTileStep] == originalTile &&
+                        path.length > 5 &&
+                        path.length < 10)) {
+                    pathsArr.push.apply(pathsArr, __spread(findPaths(row - rStep * 2, tile - doubleTileStep, rStep, tStep, doubleTileStep, friend, foe, originalTile, true, __spread(path, [
+                        tiles[row - rStep][tile],
+                        tiles[row - rStep * 2][tile - doubleTileStep]
+                    ]))));
                 }
             }
         }
@@ -229,9 +285,11 @@ var findPaths = function (row, tile, rStep, tStep, doubleTileStep, friend, foe, 
         }
     }
     delete tiles[row][tile].stepped;
-    return pathsArr.length > 0 ?
-        pathsArr.sort(function (a, b) { return b.length - a.length; }).filter(function (path) { return path.length == pathsArr[0].length; }) :
-        [__spread(path)];
+    return pathsArr.length > 0
+        ? pathsArr
+            .sort(function (a, b) { return b.length - a.length; })
+            .filter(function (path) { return path.length == pathsArr[0].length; })
+        : [__spread(path)];
 };
 var switchTurns = function () {
     if (turn == 'white-pawn') {
@@ -256,19 +314,23 @@ var checkGameOver = function () {
     }
     return false;
 };
-fullscreenIcons.forEach(function (icon) { return icon.addEventListener('click', function () {
-    document.fullscreen ?
-        document.exitFullscreen() :
-        document.documentElement.requestFullscreen();
-}); });
-knights.forEach(function (knight) { return knight.addEventListener('click', function () {
-    if (confirm('Restart the game?')) {
-        firstGame = false;
-        gameStart();
-    }
-}); });
+fullscreenIcons.forEach(function (icon) {
+    return icon.addEventListener('click', function () {
+        document.fullscreen
+            ? document.exitFullscreen()
+            : document.documentElement.requestFullscreen();
+    });
+});
+knights.forEach(function (knight) {
+    return knight.addEventListener('click', function () {
+        if (confirm('Restart the game?')) {
+            firstGame = false;
+            gameStart();
+        }
+    });
+});
 playButton.addEventListener('click', function () {
-    cover.addEventListener('transitionend', function () { return coverContainer.style.display = 'none'; });
+    cover.addEventListener('transitionend', function () { return (coverContainer.style.display = 'none'); });
     playButton.style.display = 'none';
     rules.style.display = 'none';
     cover.style.backgroundColor = 'rgba(255, 255, 255, 0)';

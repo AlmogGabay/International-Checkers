@@ -1,0 +1,26 @@
+{
+  "name": "checkers",
+  "version": "1.0.0",
+  "description": "An international draughts game.",
+  "main": "index.html",
+  "scripts": {
+    "dev": "tsc -w & node-sass -w src -o build",
+    "build": "tsc & node-sass src -o build && postcss build/checkers.css --no-map -r -u autoprefixer"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/theninthsky/checkers.git"
+  },
+  "author": "Almog Gabay",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/theninthsky/checkers/issues"
+  },
+  "homepage": "https://theninthsky.github.io/checkers",
+  "devDependencies": {
+    "autoprefixer": "^9.7.4",
+    "node-sass": "^4.13.1",
+    "postcss-cli": "^7.1.0",
+    "typescript": "^3.7.5"
+  }
+}
