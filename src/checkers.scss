@@ -82,6 +82,7 @@ body {
 }
 
 #rules {
+  padding: 0 5%;
   font-size: 4.4vmin;
 
   h1 {
@@ -281,7 +282,7 @@ body {
 }
 
 /* Mobile */
-@media (max-width: 450px) {
+@media (max-width: 480px) {
   .fullscreen-icon {
     width: 6vw;
   }
@@ -298,6 +299,8 @@ body {
   }
 
   #rules {
+    padding: 0;
+
     ul {
       margin-left: -8vmin;
     }
