@@ -38,7 +38,7 @@ var tiles = [
     qSA('.fifth'),
     qSA('.sixth'),
     qSA('.seventh'),
-    qSA('.eighth')
+    qSA('.eighth'),
 ];
 var firstGame = true;
 var turn;
@@ -210,7 +210,7 @@ var findPaths = function (row, tile, rStep, tStep, doubleTileStep, friend, foe, 
                     path.length < 10)) {
                 pathsArr.push.apply(pathsArr, __spread(findPaths(row + rStep * 2, tile + doubleTileStep, rStep, tStep, doubleTileStep, friend, foe, originalTile, true, __spread(path, [
                     tiles[row + rStep][tile + tStep],
-                    tiles[row + rStep * 2][tile + doubleTileStep]
+                    tiles[row + rStep * 2][tile + doubleTileStep],
                 ]))));
             }
         }
@@ -233,7 +233,7 @@ var findPaths = function (row, tile, rStep, tStep, doubleTileStep, friend, foe, 
                     path.length < 10)) {
                 pathsArr.push.apply(pathsArr, __spread(findPaths(row + rStep * 2, tile - doubleTileStep, rStep, tStep, doubleTileStep, friend, foe, originalTile, true, __spread(path, [
                     tiles[row + rStep][tile],
-                    tiles[row + rStep * 2][tile - doubleTileStep]
+                    tiles[row + rStep * 2][tile - doubleTileStep],
                 ]))));
             }
         }
@@ -252,7 +252,7 @@ var findPaths = function (row, tile, rStep, tStep, doubleTileStep, friend, foe, 
                         path.length < 10)) {
                     pathsArr.push.apply(pathsArr, __spread(findPaths(row - rStep * 2, tile + doubleTileStep, rStep, tStep, doubleTileStep, friend, foe, originalTile, true, __spread(path, [
                         tiles[row - rStep][tile + tStep],
-                        tiles[row - rStep * 2][tile + doubleTileStep]
+                        tiles[row - rStep * 2][tile + doubleTileStep],
                     ]))));
                 }
             }
@@ -275,7 +275,7 @@ var findPaths = function (row, tile, rStep, tStep, doubleTileStep, friend, foe, 
                         path.length < 10)) {
                     pathsArr.push.apply(pathsArr, __spread(findPaths(row - rStep * 2, tile - doubleTileStep, rStep, tStep, doubleTileStep, friend, foe, originalTile, true, __spread(path, [
                         tiles[row - rStep][tile],
-                        tiles[row - rStep * 2][tile - doubleTileStep]
+                        tiles[row - rStep * 2][tile - doubleTileStep],
                     ]))));
                 }
             }

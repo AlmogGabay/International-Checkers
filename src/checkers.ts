@@ -27,7 +27,7 @@ const tiles: NodeListOf<TileElement>[] = [
   qSA('.fifth'),
   qSA('.sixth'),
   qSA('.seventh'),
-  qSA('.eighth')
+  qSA('.eighth'),
 ]
 
 let firstGame: boolean = true
@@ -62,7 +62,7 @@ const clearTiles = (tilesRow: NodeListOf<TileElement>): void => {
       'suggested-move-white-pawn',
       'suggested-move-black-pawn',
       'intermediate-capture',
-      'capture'
+      'capture',
     )
     delete tile.whitePawn
     delete tile.blackPawn
@@ -87,16 +87,16 @@ const fillPawns = (): void => {
         row &&
         row.forEach((tile: TileElement, tileIndex: number) =>
           tile.addEventListener('click', () =>
-            checkChosenPath(tile, rowIndex, tileIndex)
-          )
-        )
+            checkChosenPath(tile, rowIndex, tileIndex),
+          ),
+        ),
     )
   }
 }
 
 const setPawn = (
   pawnColor: 'white-pawn' | 'black-pawn',
-  tile: TileElement
+  tile: TileElement,
 ): void => {
   tile.classList.add(pawnColor)
   tile[pawnColor == 'white-pawn' ? 'whitePawn' : 'blackPawn'] = true
@@ -105,12 +105,12 @@ const setPawn = (
 const checkChosenPath = (
   selectedTile: TileElement,
   row: number,
-  tile: number
+  tile: number,
 ): void => {
   if (selectedTile.classList.contains(`suggested-move-${turn}`)) {
     if (paths[0].length > 1) {
       const chosenPath: TileElement[] = paths.filter((path: TileElement[]) =>
-        path.includes(selectedTile)
+        path.includes(selectedTile),
       )[0] // [0] is to prevent a 'reversed diamond' capture
       move(chosenPath)
     }
@@ -170,7 +170,7 @@ const move = (chosenPath: TileElement[]): void => {
 
 const clearPaths = (
   chosenPath: TileElement[],
-  lastSelected?: TileElement
+  lastSelected?: TileElement,
 ): void => {
   paths.forEach((path: TileElement[]) =>
     path.forEach((tile: TileElement) => {
@@ -178,9 +178,9 @@ const clearPaths = (
         'intermediate-capture',
         'capture',
         'suggested-move-white-pawn',
-        'suggested-move-black-pawn'
+        'suggested-move-black-pawn',
       )
-    })
+    }),
   )
 
   if (chosenPath) {
@@ -189,7 +189,7 @@ const clearPaths = (
         'white-pawn',
         'black-pawn',
         'white-king',
-        'black-king'
+        'black-king',
       )
       delete tile.whitePawn
       delete tile.blackPawn
@@ -206,7 +206,7 @@ const clearPaths = (
 const handlePaths = (
   selectedTile: TileElement,
   row: number,
-  tile: number
+  tile: number,
 ): void => {
   if (turn == 'white-pawn') {
     row % 2 == 0
@@ -218,7 +218,7 @@ const handlePaths = (
           1,
           'whitePawn',
           'blackPawn',
-          selectedTile
+          selectedTile,
         ))
       : (paths = findPaths(
           row,
@@ -228,7 +228,7 @@ const handlePaths = (
           -1,
           'whitePawn',
           'blackPawn',
-          selectedTile
+          selectedTile,
         ))
   } else {
     row % 2 == 0
@@ -240,7 +240,7 @@ const handlePaths = (
           1,
           'blackPawn',
           'whitePawn',
-          selectedTile
+          selectedTile,
         ))
       : (paths = findPaths(
           row,
@@ -250,7 +250,7 @@ const handlePaths = (
           -1,
           'blackPawn',
           'whitePawn',
-          selectedTile
+          selectedTile,
         ))
   }
 
@@ -263,7 +263,7 @@ const handlePaths = (
       } else {
         tile.classList.add('intermediate-capture')
       }
-    })
+    }),
   )
 }
 
@@ -278,7 +278,7 @@ const findPaths = (
   foe: 'whitePawn' | 'blackPawn',
   originalTile: TileElement,
   captureOccured: boolean = false,
-  path: TileElement[] = []
+  path: TileElement[] = [],
 ): TileElement[][] => {
   const pathsArr: TileElement[][] = []
   tiles[row][tile].stepped = true
@@ -324,9 +324,9 @@ const findPaths = (
             [
               ...path,
               tiles[row + rStep][tile + tStep],
-              tiles[row + rStep * 2][tile + doubleTileStep]
-            ]
-          )
+              tiles[row + rStep * 2][tile + doubleTileStep],
+            ],
+          ),
         )
       }
     }
@@ -367,9 +367,9 @@ const findPaths = (
             [
               ...path,
               tiles[row + rStep][tile],
-              tiles[row + rStep * 2][tile - doubleTileStep]
-            ]
-          )
+              tiles[row + rStep * 2][tile - doubleTileStep],
+            ],
+          ),
         )
       }
     }
@@ -408,9 +408,9 @@ const findPaths = (
               [
                 ...path,
                 tiles[row - rStep][tile + tStep],
-                tiles[row - rStep * 2][tile + doubleTileStep]
-              ]
-            )
+                tiles[row - rStep * 2][tile + doubleTileStep],
+              ],
+            ),
           )
         }
       }
@@ -452,9 +452,9 @@ const findPaths = (
               [
                 ...path,
                 tiles[row - rStep][tile],
-                tiles[row - rStep * 2][tile - doubleTileStep]
-              ]
-            )
+                tiles[row - rStep * 2][tile - doubleTileStep],
+              ],
+            ),
           )
         }
       }
@@ -504,7 +504,7 @@ fullscreenIcons.forEach((icon: HTMLImageElement) =>
     document.fullscreen
       ? document.exitFullscreen()
       : document.documentElement.requestFullscreen()
-  })
+  }),
 )
 
 knights.forEach((knight: HTMLImageElement) =>
@@ -513,13 +513,13 @@ knights.forEach((knight: HTMLImageElement) =>
       firstGame = false
       gameStart()
     }
-  })
+  }),
 )
 
 playButton.addEventListener('click', () => {
   cover.addEventListener(
     'transitionend',
-    () => (coverContainer.style.display = 'none')
+    () => (coverContainer.style.display = 'none'),
   )
   playButton.style.display = 'none'
   rules.style.display = 'none'
