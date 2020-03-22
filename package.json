@@ -4,8 +4,8 @@
   "description": "An international draughts game.",
   "main": "index.html",
   "scripts": {
-    "dev": "tsc -w & node-sass -w src -o build",
-    "build": "tsc & node-sass src -o build && postcss build/checkers.css --no-map -r -u autoprefixer",
+    "dev": "tsc -w && node-sass -w src -o build",
+    "build": "tsc && node-sass src -o build && postcss build/checkers.css --no-map -r -u autoprefixer",
     "deploy": "npm run build && git push origin master"
   },
   "repository": {
