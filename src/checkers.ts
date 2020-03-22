@@ -1,4 +1,4 @@
-/* -VARIABLE DEFINITIONS- */
+/*** Variable Definitions ***/
 
 type TileElement = HTMLElement & {
   whitePawn?: boolean
@@ -37,7 +37,7 @@ let blackPawns: number
 let lastSelected: TileElement
 let paths: TileElement[][] = []
 
-/* -FUNCTION DEFINITIONS- */
+/*** Function Definitions ***/
 
 const gameStart = (): void => {
   turn = 'white-pawn'
@@ -283,7 +283,7 @@ const findPaths = (
   const pathsArr: TileElement[][] = []
   tiles[row][tile].stepped = true
 
-  /* FORWARD MOVEMENT */
+  /* Forward Movement */
   if (
     tiles[row + rStep] &&
     tiles[row + rStep][tile + tStep] &&
@@ -375,7 +375,7 @@ const findPaths = (
     }
   }
 
-  /* BACKWARD MOVEMENT */
+  /* Backward Movement */
   if (
     tiles[row - rStep] &&
     tiles[row - rStep][tile + tStep] &&
@@ -497,7 +497,7 @@ const checkGameOver = (): boolean => {
   return false
 }
 
-/* -EVENT LISTENERS- */
+/*** Event Listeners ***/
 
 fullscreenIcons.forEach((icon: HTMLImageElement) =>
   icon.addEventListener('click', () => {
