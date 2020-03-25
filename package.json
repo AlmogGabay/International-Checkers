@@ -7,7 +7,7 @@
     "dev": "tsc -w & node-sass -w src -o build",
     "lint": "eslint '*/**/*.ts'",
     "build": "npm run lint && tsc && node-sass src -o build && postcss build/checkers.css --no-map -r -u autoprefixer",
-    "commit": "git add . && git commit -m 'Deployment commit'",
+    "commit": "git add . && git commit -m 'Deployment guard commit'",
     "deploy": "npm run build && npm run commit || git push origin master"
   },
   "repository": {
