@@ -1,6 +1,6 @@
 /*** Variable Definitions ***/
 
-type TileElement = HTMLElement & {
+type TileElement = HTMLDivElement & {
   whitePawn?: boolean
   blackPawn?: boolean
   king?: boolean
@@ -30,7 +30,7 @@ const tiles: NodeListOf<TileElement>[] = [
   qSA('.eighth'),
 ]
 
-let firstGame: boolean = true
+let firstGame = true
 let turn: 'white-pawn' | 'black-pawn'
 let whitePawns: number
 let blackPawns: number
@@ -39,7 +39,7 @@ let paths: TileElement[][] = []
 
 /*** Function Definitions ***/
 
-const gameStart = (): void => {
+const gameStart = () => {
   turn = 'white-pawn'
   whitePawns = 12
   blackPawns = 12
@@ -51,7 +51,7 @@ const gameStart = (): void => {
 }
 
 /* Clears all of the previous pawns */
-const clearTiles = (tilesRow: NodeListOf<TileElement>): void => {
+const clearTiles = (tilesRow: NodeListOf<TileElement>) => {
   tilesRow.forEach((tile: TileElement) => {
     tile.classList.remove(
       'pressed-pawn',
@@ -71,7 +71,7 @@ const clearTiles = (tilesRow: NodeListOf<TileElement>): void => {
 }
 
 /* Places all the pawns in their initial position */
-const fillPawns = (): void => {
+const fillPawns = () => {
   tiles.forEach((row: NodeListOf<TileElement>, rowIndex: number) => {
     if (rowIndex >= 1 && rowIndex <= 3) {
       row.forEach((tile: TileElement) => setPawn('white-pawn', tile))
@@ -94,10 +94,7 @@ const fillPawns = (): void => {
   }
 }
 
-const setPawn = (
-  pawnColor: 'white-pawn' | 'black-pawn',
-  tile: TileElement,
-): void => {
+const setPawn = (pawnColor: 'white-pawn' | 'black-pawn', tile: TileElement) => {
   tile.classList.add(pawnColor)
   tile[pawnColor == 'white-pawn' ? 'whitePawn' : 'blackPawn'] = true
 }
@@ -106,7 +103,7 @@ const checkChosenPath = (
   selectedTile: TileElement,
   row: number,
   tile: number,
-): void => {
+) => {
   if (selectedTile.classList.contains(`suggested-move-${turn}`)) {
     if (paths[0].length > 1) {
       const chosenPath: TileElement[] = paths.filter((path: TileElement[]) =>
@@ -161,17 +158,14 @@ const checkChosenPath = (
   lastSelected = selectedTile // 'remembers' the last tile that was selected, this allows a capturer to move to its new position
 }
 
-const move = (chosenPath: TileElement[]): void => {
+const move = (chosenPath: TileElement[]) => {
   turn == 'white-pawn'
     ? (blackPawns -= chosenPath.length / 2)
     : (whitePawns -= chosenPath.length / 2)
   clearPaths(chosenPath)
 }
 
-const clearPaths = (
-  chosenPath: TileElement[],
-  lastSelected?: TileElement,
-): void => {
+const clearPaths = (chosenPath: TileElement[], lastSelected?: TileElement) => {
   paths.forEach((path: TileElement[]) =>
     path.forEach((tile: TileElement) => {
       tile.classList.remove(
@@ -203,11 +197,7 @@ const clearPaths = (
   }
 }
 
-const handlePaths = (
-  selectedTile: TileElement,
-  row: number,
-  tile: number,
-): void => {
+const handlePaths = (selectedTile: TileElement, row: number, tile: number) => {
   if (turn == 'white-pawn') {
     row % 2 == 0
       ? (paths = findPaths(
@@ -277,7 +267,7 @@ const findPaths = (
   friend: 'whitePawn' | 'blackPawn',
   foe: 'whitePawn' | 'blackPawn',
   originalTile: TileElement,
-  captureOccured: boolean = false,
+  captureOccured = false,
   path: TileElement[] = [],
 ): TileElement[][] => {
   const pathsArr: TileElement[][] = []
@@ -472,7 +462,7 @@ const findPaths = (
     : [[...path]]
 }
 
-const switchTurns = (): void => {
+const switchTurns = () => {
   if (turn == 'white-pawn') {
     turn = 'black-pawn'
     knights[0].style.opacity = '0.3'

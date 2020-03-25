@@ -5,8 +5,10 @@
   "main": "index.html",
   "scripts": {
     "dev": "tsc -w & node-sass -w src -o build",
-    "build": "tsc && node-sass src -o build && postcss build/checkers.css --no-map -r -u autoprefixer",
-    "deploy": "git push origin master"
+    "lint": "eslint '*/**/*.ts'",
+    "build": "npm run lint && tsc && node-sass src -o build && postcss build/checkers.css --no-map -r -u autoprefixer",
+    "commit": "git add . && git commit -m 'Deployment commit'",
+    "deploy": "npm run build && npm run commit && git push origin master"
   },
   "repository": {
     "type": "git",
@@ -19,7 +21,10 @@
   },
   "homepage": "https://theninthsky.github.io/checkers",
   "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^2.25.0",
+    "@typescript-eslint/parser": "^2.25.0",
     "autoprefixer": "^9.7.4",
+    "eslint": "^6.8.0",
     "node-sass": "^4.13.1",
     "postcss-cli": "^7.1.0",
     "typescript": "^3.8.3"
