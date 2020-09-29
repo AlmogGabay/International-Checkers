@@ -10,7 +10,7 @@
     "lint": "eslint . --ext .ts",
     "build": "npm run eslint && tsc && node-sass src -o build && postcss build/checkers.css --no-map -r -u autoprefixer",
     "commit": "git add . && git commit -m 'Deployment guard commit'",
-    "deploy": "npm run build && npm run commit || git push origin master"
+    "publish": "npm run build && npm run commit || git push origin master"
   },
   "repository": {
     "type": "git",
